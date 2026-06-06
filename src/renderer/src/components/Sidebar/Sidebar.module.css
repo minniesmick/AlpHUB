@@ -1,0 +1,105 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: var(--sidebar-width);
+  padding: var(--space-2) 0;
+  position: relative;
+}
+
+/* Ambient bloom — always-on purple radial cast */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 160px at 50% 25%,
+    color-mix(in srgb, var(--primary) 10%, transparent),
+    transparent 80%
+  );
+}
+
+.toolList,
+.bottomList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toolList {
+  flex: 1;
+}
+
+.bottomList {
+  padding-bottom: var(--space-2);
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-snappy), background var(--dur-fast) var(--ease-snappy);
+}
+
+.navItem:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+}
+
+.navItem.active {
+  color: var(--primary);
+  background: var(--primary-tint);
+  box-shadow: var(--glow-primary-sm), inset 0 0 0 1px var(--primary-glow);
+}
+
+/* Left gradient bar — visible only when active */
+.activeBar {
+  position: absolute;
+  left: -7px;   /* sits in the 1px sidebar border zone */
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  transform-origin: center;
+  width: 3px;
+  height: 20px;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  background: var(--gradient-accent-v);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+.navItem.active .activeBar {
+  transform: translateY(-50%) scaleY(1);
+}
+
+/* ── Stream active indicator ─────────────────────────────────────────────── */
+
+.streamDot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success), 0 0 3px var(--success);
+  animation: dot-pulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.5; transform: scale(0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streamDot { animation: none; }
+}

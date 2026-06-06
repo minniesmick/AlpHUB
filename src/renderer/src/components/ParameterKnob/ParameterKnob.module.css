@@ -1,0 +1,81 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  user-select: none;
+}
+
+.svgWrap {
+  position: relative;
+  cursor: ns-resize;
+  transition: transform 0.1s var(--ease-bounce);
+}
+
+.svgWrap:active {
+  transform: scale(0.92);
+}
+
+.svgWrap:focus-visible {
+  outline: none;
+}
+
+.svgWrap:focus-visible .track {
+  stroke: var(--primary-dim);
+}
+
+.track {
+  stroke: var(--border-default);
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke 0.15s;
+}
+
+.value {
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 3px var(--primary-glow));
+  transition: filter 0.15s;
+}
+
+.svgWrap:active .value,
+.active .value {
+  filter: drop-shadow(0 0 6px var(--primary));
+}
+
+.dot {
+  fill: var(--primary);
+  transition: fill 0.1s, r 0.1s;
+}
+
+.svgWrap:active .dot {
+  fill: var(--secondary);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fade-in 0.1s var(--ease-out) both;
+  z-index: var(--z-tooltip);
+}

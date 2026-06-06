@@ -1,0 +1,47 @@
+appId: com.alphub.app
+productName: AlpHUB
+copyright: Copyright © 2026 Alper Yaman
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - out/**/*
+  - package.json
+
+# Bundle the Python backend into resources/backend/
+extraResources:
+  - from: backend
+    to: backend
+    filter:
+      - "**/*.py"
+      - "**/*.txt"
+      - "!**/__pycache__/**"
+      - "!**/*.pyc"
+      - "!**/*.pyo"
+
+# Windows
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  # build/icon.ico picked up automatically via buildResources; explicit path here as fallback
+  icon: build/icon.ico
+  artifactName: AlpHUB-Setup-${version}.exe
+
+# NSIS installer options
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: AlpHUB
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+
+# Portable (no install required)
+portable:
+  artifactName: AlpHUB-Portable-${version}.exe

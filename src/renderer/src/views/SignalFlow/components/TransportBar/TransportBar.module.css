@@ -1,0 +1,104 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 44px;
+  background: var(--surface-2);
+  border-top: var(--edge-highlight);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-default);
+  margin: 0 var(--space-1);
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-disabled);
+  white-space: nowrap;
+}
+
+/* Chip */
+.chip {
+  height: 22px;
+  padding: 0 var(--space-2);
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Stream status */
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.statusDot.active {
+  background: var(--source);
+  box-shadow: var(--source-glow);
+}
+
+.statusDot.error { background: var(--error); }
+
+/* Play button */
+.playBtn {
+  height: 30px;
+  padding: 0 var(--space-4);
+  border-radius: 6px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: opacity 0.1s, background 0.1s, box-shadow 0.15s;
+}
+
+.playBtn.stopped {
+  background: var(--primary-tint);
+  color: var(--primary);
+  border: 1px solid var(--primary-dim);
+}
+
+.playBtn.stopped:hover {
+  background: var(--primary-active);
+  box-shadow: var(--glow-primary);
+}
+
+.playBtn.running {
+  background: var(--secondary-tint);
+  color: var(--secondary);
+  border: 1px solid var(--secondary-dim);
+}
+
+.playBtn.running:hover {
+  background: var(--secondary-active);
+  box-shadow: var(--glow-secondary);
+}
+
+.playBtn:disabled { opacity: 0.4; cursor: not-allowed; }

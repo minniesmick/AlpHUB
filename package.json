@@ -1,0 +1,40 @@
+{
+  "name": "alphub",
+  "version": "0.1.0",
+  "description": "Personal audio processing HUB — Signal Flow · Pipeline · Stem Splitter",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "backend": "D:\\AI_Ortak_Venv\\hub_venv\\Scripts\\python.exe -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8765 --reload",
+    "start": "concurrently --kill-others-on-fail -n backend,electron -c magenta,cyan \"npm run backend\" \"npm run dev\"",
+    "setup-venv": "cd backend && powershell -ExecutionPolicy Bypass -File setup_venv.ps1",
+    "dist": "npm run build && electron-builder --win nsis",
+    "dist:portable": "npm run build && electron-builder --win portable"
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config-ts": "^3.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^10.0.0",
+    "electron": "^31.0.2",
+    "electron-builder": "^26.8.1",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.5.2",
+    "vite": "^5.3.1"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/utils": "^3.0.0",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "@xyflow/react": "^12.3.6",
+    "lucide-react": "^0.511.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.24.0"
+  }
+}

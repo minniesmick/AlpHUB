@@ -1,0 +1,270 @@
+/* ── StemGrid ─────────────────────────────────────────────────────────────── */
+
+.root {
+  animation: slide-up 0.28s var(--ease-spring) both;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+}
+
+.clearBtn {
+  margin-left: auto;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border-radius: 4px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-disabled);
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.1s, border-color 0.1s;
+}
+.clearBtn:hover { color: var(--secondary); border-color: var(--secondary-dim); }
+
+/* ── Card grid ────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-3);
+}
+
+/* ── Individual stem card ─────────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-top: 2px solid var(--stem-dim);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  animation: slide-up 0.32s var(--ease-spring) both;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.card:hover {
+  border-color: var(--stem-dim);
+  border-top-color: var(--stem-color);
+  background: var(--stem-tint);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--stem-color) 15%, transparent);
+}
+
+/* Playing state — card glows with stem color */
+.cardPlaying {
+  border-top-color: var(--stem-color) !important;
+  background: var(--stem-tint) !important;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--stem-color) 22%, transparent);
+}
+
+/* ── Waveform wrapper (clickable play area) ───────────────────────────────── */
+
+.waveWrap {
+  position: relative;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+  outline: none;
+}
+
+.waveWrap:focus-visible {
+  box-shadow: 0 0 0 2px var(--stem-color);
+}
+
+/* Play/pause icon overlay — appears on hover */
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--stem-color);
+  opacity: 0;
+  background: color-mix(in srgb, var(--stem-color) 8%, transparent);
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.waveWrap:hover .playOverlay { opacity: 1; }
+.cardPlaying .playOverlay    { opacity: 1; }
+
+.playOverlayError {
+  opacity: 0.5 !important;
+  color: var(--text-disabled) !important;
+  background: transparent !important;
+  font-size: 14px;
+  cursor: not-allowed;
+}
+
+/* ── Mini waveform ────────────────────────────────────────────────────────── */
+
+.miniWave {
+  display: block;
+  width: 100%;
+  height: 36px;
+  margin-bottom: var(--space-1);
+}
+
+.miniBar {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: bar-in 0.4s var(--ease-spring) both;
+}
+
+/* Playing bars pulse subtly */
+.miniBarPlaying {
+  animation: bar-in 0.4s var(--ease-spring) both, bar-breathe 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes bar-in {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes bar-breathe {
+  from { opacity: 0.7; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .miniBar       { animation: none; opacity: 1; }
+  .card          { animation: none; }
+  .root          { animation: none; }
+  .progressTrack { transition: none; }
+}
+
+/* ── Playback progress bar ────────────────────────────────────────────────── */
+
+.progressTrack {
+  height: 4px;  /* fixed — no layout thrash */
+  background: color-mix(in srgb, var(--stem-color) 18%, transparent);
+  border-radius: 1px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  outline: none;
+  transform: scaleY(0.5);
+  transform-origin: center center;
+  transition: transform 0.15s var(--ease-out);
+}
+
+.progressTrack:hover {
+  transform: scaleY(1);
+}
+
+.progressTrack:focus-visible {
+  transform: scaleY(1);
+  box-shadow: 0 0 0 2px var(--stem-color);
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: var(--stem-color);
+  border-radius: 1px;
+  transform-origin: left center;
+  transition: transform 0.2s linear;
+  box-shadow: 0 0 5px color-mix(in srgb, var(--stem-color) 70%, transparent);
+}
+
+/* ── Text content ─────────────────────────────────────────────────────────── */
+
+.stemLabel {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--stem-color);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--stem-color) 40%, transparent);
+}
+
+.filename {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-disabled);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.fileTime {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-disabled);
+  opacity: 0.6;
+}
+
+/* ── Actions row ──────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.folderBtn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-disabled);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.1s, border-color 0.1s;
+}
+
+.folderBtn:hover {
+  color: var(--stem-color);
+  border-color: var(--stem-dim);
+}
+
+/* ── Send button ──────────────────────────────────────────────────────────── */
+
+.sendBtn {
+  flex: 1;
+  height: 26px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--stem-dim);
+  background: var(--stem-tint);
+  color: var(--stem-color);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.1s, box-shadow 0.15s, border-color 0.1s;
+  white-space: nowrap;
+}
+
+.sendBtn:hover {
+  background: color-mix(in srgb, var(--stem-color) 18%, transparent);
+  border-color: var(--stem-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--stem-color) 30%, transparent);
+}
+
+.sendBtn:active { transform: scale(0.97); }

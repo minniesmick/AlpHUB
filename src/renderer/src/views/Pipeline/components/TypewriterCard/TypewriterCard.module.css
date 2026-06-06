@@ -1,0 +1,110 @@
+/* ── TypewriterCard ───────────────────────────────────────────────────────── */
+
+.card {
+  border: 1px solid var(--border-default);
+  border-top: 2px solid var(--primary-dim);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  overflow: hidden;
+  animation: slide-up 0.32s var(--ease-spring) both;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  background: var(--primary-tint);
+  border: 1px solid var(--primary-glow);
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-disabled);
+  flex: 1;
+}
+
+.copyBtn {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.2s var(--ease-spring), transform 0.2s var(--ease-spring), color 0.1s;
+}
+
+.copyBtnVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.copyBtn:hover { opacity: 0.7; }
+
+.wordCount {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-disabled);
+  letter-spacing: 0.04em;
+  animation: fade-in 0.2s var(--ease-out) both;
+}
+
+/* ── Content ─────────────────────────────────────────────────────────────── */
+
+.content {
+  padding: var(--space-3);
+  max-height: 280px;
+  overflow-y: auto;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  color: var(--text-primary);
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.text {
+  /* Text itself — nothing special, cursor is a sibling */
+}
+
+/* ── Blinking cursor ─────────────────────────────────────────────────────── */
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.88em;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+  animation: cursor-blink 1s step-end infinite;
+  box-shadow: var(--glow-primary-sm);
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; opacity: 1; }
+  .copyBtn, .copyBtnVisible { transition: none; }
+}

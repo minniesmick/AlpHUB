@@ -1,0 +1,286 @@
+.view {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background:
+    radial-gradient(ellipse 50% 30% at 0% 0%,
+      color-mix(in srgb, var(--primary) 5%, transparent),
+      transparent),
+    var(--void);
+  animation: fade-in 0.15s var(--ease-out) both;
+}
+
+/* Sub-nav */
+.subnav {
+  width: var(--settings-subnav-width);
+  flex-shrink: 0;
+  background: var(--surface-1);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) 0;
+}
+
+.subnavItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  transition: color 0.1s, background 0.1s;
+}
+
+.subnavItem:hover { color: var(--text-primary); background: var(--surface-2); }
+
+.subnavItem.active {
+  color: var(--primary);
+  background: var(--primary-active);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 520px;
+}
+
+.section { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* PathField */
+.pathField { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.pathLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.pathRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pathInput {
+  flex: 1;
+  height: 34px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  padding: 0 var(--space-3);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  transition: border-color 0.1s;
+}
+
+.pathInput:hover  { border-color: var(--border-strong); }
+.pathInput:focus  { outline: none; border-color: var(--primary-dim); }
+.pathInput::placeholder { color: var(--text-disabled); }
+
+.rescanBtn {
+  height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.rescanBtn:hover  { border-color: var(--primary-dim); color: var(--primary); }
+.rescanBtn:active { background: var(--primary-tint); }
+
+/* ASIO selector */
+.row { display: flex; align-items: center; gap: var(--space-3); }
+
+.rowLabel {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  min-width: 60px;
+}
+
+.select {
+  flex: 1;
+  height: 34px;
+  padding: 0 var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.select:focus { outline: none; border-color: var(--primary-dim); }
+
+.hint {
+  font-size: 10px;
+  color: var(--text-disabled);
+  line-height: 1.4;
+}
+
+.clearDataBtn {
+  margin-top: var(--space-2);
+  height: 30px;
+  padding: 0 var(--space-3);
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+}
+.clearDataBtn:hover {
+  border-color: var(--secondary-dim);
+  color: var(--secondary);
+  background: var(--secondary-tint);
+}
+
+/* ── System info grid ────────────────────────────────────────────────────────── */
+
+.sysGrid {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  row-gap: var(--space-2);
+  column-gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.sysKey {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.sysVal {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.sysValOn  { color: var(--success); }
+.sysValOff { color: var(--text-disabled); }
+
+/* ── Profiles panel ────────────────────────────────────────────────────────── */
+
+.emptyProfiles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.emptyProfilesText {
+  font-size: var(--text-sm);
+  color: var(--text-disabled);
+  font-style: italic;
+}
+
+.profileList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.profileCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: border-color 0.1s;
+  animation: slide-up 0.2s var(--ease-spring) both;
+}
+
+.profileCard:hover { border-color: var(--border-strong); }
+
+.profileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileMeta {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-disabled);
+}
+
+.profileDeleteBtn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-disabled);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s, background 0.1s, border-color 0.1s;
+}
+
+.profileCard:hover .profileDeleteBtn { opacity: 1; }
+
+.profileDeleteBtn:hover {
+  color: var(--secondary);
+  background: var(--secondary-tint);
+  border-color: var(--secondary-dim);
+}
+
+.profileDeleteBtn:disabled { opacity: 0.4; cursor: not-allowed; }

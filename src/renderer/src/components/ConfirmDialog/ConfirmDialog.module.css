@@ -1,0 +1,76 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 15, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--space-8);
+  animation: fade-in 0.15s var(--ease-out) both;
+}
+
+.dialog {
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  border-top: 2px solid var(--primary-dim);
+  border-radius: 12px;
+  padding: var(--space-5) var(--space-6);
+  width: 360px;
+  max-width: calc(100vw - var(--space-8));
+  animation: slide-up 0.22s var(--ease-spring) both;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.7), var(--glow-primary-md);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.body {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-5);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 var(--space-4);
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: opacity 0.1s, background 0.1s;
+  border: none;
+}
+
+.btnCancel {
+  background: var(--surface-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.btnCancel:hover { background: var(--surface-4); }
+
+.btnConfirm {
+  background: var(--secondary-tint);
+  color: var(--secondary);
+  border: 1px solid var(--secondary-dim);
+}
+
+.btnConfirm:hover {
+  background: var(--secondary-active);
+}

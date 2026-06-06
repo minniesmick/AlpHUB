@@ -1,0 +1,205 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: transparent;
+}
+
+.panel {
+  position: fixed;
+  bottom: calc(var(--statusbar-height) + 6px);
+  right: var(--space-4);
+  width: 320px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-default);
+  border-top: var(--edge-highlight);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: calc(var(--z-overlay) + 1);
+  animation: slide-up 0.18s var(--ease-spring) both;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), var(--glow-primary);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.closeBtn {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s, border-color 0.1s;
+  padding: 0;
+}
+
+.closeBtn:hover { color: var(--text-primary); border-color: var(--border-strong); }
+
+.list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.job {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.job:last-child { border-bottom: none; }
+
+.jobHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.statusDot.active {
+  background: var(--primary);
+  box-shadow: var(--glow-primary);
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.statusDot.queued { background: var(--border-strong); }
+
+.jobName {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobTool {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-disabled);
+}
+
+.progressBar {
+  height: 2px;
+  background: var(--surface-3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: var(--gradient-accent-h);
+  border-radius: 99px;
+  transform-origin: left center;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.empty {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+}
+
+/* ── Job meta row (pct + stage + eta) ────────────────────────────────────── */
+
+.jobMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pct {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.stage {
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Cancel button ────────────────────────────────────────────────────────── */
+
+.cancelBtn {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--secondary-dim);
+  background: var(--secondary-tint);
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.1s, box-shadow 0.15s, border-color 0.1s;
+  opacity: 0;
+}
+
+.job:hover .cancelBtn { opacity: 1; }
+
+.cancelBtn:hover {
+  background: color-mix(in srgb, var(--secondary) 20%, transparent);
+  border-color: var(--secondary);
+  box-shadow: var(--glow-secondary-sm);
+}
+
+.cancelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cancelling state dims the whole row */
+.jobCancelling {
+  opacity: 0.5;
+  pointer-events: none;
+}

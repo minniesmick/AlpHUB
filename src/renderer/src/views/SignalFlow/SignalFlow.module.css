@@ -1,0 +1,74 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background:
+    radial-gradient(ellipse 60% 40% at 100% 100%,
+      color-mix(in srgb, var(--secondary) 4%, transparent),
+      transparent),
+    radial-gradient(ellipse 60% 40% at 0% 0%,
+      color-mix(in srgb, var(--primary) 5%, transparent),
+      transparent),
+    var(--void);
+  animation: fade-in 0.15s var(--ease-out) both;
+}
+
+.topbar {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-default);
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
+}
+
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 var(--space-2);
+  border-left: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.1s, background 0.1s, border-color 0.1s;
+  padding: 0;
+}
+
+.actionBtn:hover {
+  color: var(--text-primary);
+  background: var(--surface-2);
+  border-color: var(--border-default);
+}
+
+.actionBtnActive {
+  color: var(--primary);
+  background: var(--primary-tint);
+  border-color: var(--primary-dim);
+}
+
+.workarea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.canvasCol {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

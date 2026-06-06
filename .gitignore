@@ -1,0 +1,74 @@
+# ── Dependencies ──────────────────────────────────────────────────────────────
+node_modules/
+
+# ── Build output ──────────────────────────────────────────────────────────────
+out/
+dist/
+build/win-unpacked/
+build/linux-unpacked/
+build/mac/
+*.AppImage
+*.dmg
+*.snap
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+
+# ── Python venvs ──────────────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+hub_venv/
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+backend/.env
+.env
+.env.*
+!.env.example
+
+# ── Design & AI workflow artifacts ────────────────────────────────────────────
+.design/
+.impeccable/
+
+# ── Markdown — keep only README ───────────────────────────────────────────────
+*.md
+!README.md
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ── Large assets ──────────────────────────────────────────────────────────────
+wallpaper.png
+wallpaper.jpg
+wallpaper.jpeg
+wallpaper.webp
+
+# ── OS junk ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ── Editor ────────────────────────────────────────────────────────────────────
+.vscode/settings.json
+*.suo
+*.user
+*.local
+.idea/
+*.swp
+*.swo
+
+# ── Electron ──────────────────────────────────────────────────────────────────
+app-update.yml
+builder-debug.yml
+builder-effective-config.yaml

@@ -1,0 +1,108 @@
+.stack {
+  position: fixed;
+  bottom: calc(var(--statusbar-height) + 12px);
+  right: 12px;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 320px;
+  pointer-events: none;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  background: var(--surface-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  pointer-events: all;
+  animation: slide-up 0.28s var(--ease-spring) both;
+}
+
+/* Type variants: full border tint + bg tint, no side stripe */
+.card.error   {
+  border-color: var(--secondary-dim);
+  background: color-mix(in srgb, var(--secondary) 9%, var(--surface-3));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--secondary-glow);
+}
+.card.success {
+  border-color: color-mix(in srgb, var(--success) 45%, transparent);
+  background: color-mix(in srgb, var(--success) 9%, var(--surface-3));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 12px var(--success-tint);
+}
+.card.warning {
+  border-color: color-mix(in srgb, var(--warning) 45%, transparent);
+  background: color-mix(in srgb, var(--warning) 9%, var(--surface-3));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 12px var(--warning-tint);
+}
+.card.info {
+  border-color: var(--primary-dim);
+  background: color-mix(in srgb, var(--primary) 9%, var(--surface-3));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--primary-glow);
+}
+
+/* Exit animation — higher specificity (2 classes) wins over .card entry */
+.card.exiting {
+  animation: toast-exit 0.2s var(--ease-in) forwards;
+}
+
+@keyframes toast-exit {
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* ── Progress bar (shrinks over duration via scaleX) ─────────────────────── */
+
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+}
+
+.error   .bar { background: var(--secondary); }
+.success .bar { background: var(--success); }
+.warning .bar { background: var(--warning); }
+.info    .bar { background: var(--primary); }
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 10px 12px 12px;
+}
+
+.message {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  line-height: var(--leading-snug);
+  word-break: break-word;
+}
+
+.close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+
+.close:hover {
+  color: var(--text-primary);
+  background: var(--surface-4);
+}

@@ -1,0 +1,109 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--statusbar-height);
+  padding: 0 var(--space-4);
+  background: var(--surface-1);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-snappy);
+}
+
+.clickable:hover { background: var(--surface-2); }
+
+.icon {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.iconActive {
+  color: var(--primary);
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.jobName {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.idle {
+  font-size: var(--text-sm);
+  color: var(--text-disabled);
+}
+
+.progressTrack {
+  width: 80px;
+  height: 3px;
+  background: var(--border-default);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progressFill {
+  height: 100%;
+  width: 100%;
+  background: var(--gradient-accent-h);
+  box-shadow: var(--glow-progress);
+  border-radius: var(--radius-pill);
+  transform-origin: left center;
+  transition: transform var(--dur-normal) var(--ease-smooth);
+}
+
+.pct {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.stage {
+  font-size: var(--text-xs);
+  color: var(--text-disabled);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.queueBadge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--primary);
+  background: var(--primary-tint);
+  border-radius: var(--radius-xs);
+  padding: 2px var(--space-2);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
