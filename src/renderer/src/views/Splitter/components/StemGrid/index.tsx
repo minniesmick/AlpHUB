@@ -7,10 +7,18 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { Play, Pause } from 'lucide-react'
 import { useFileTransfer } from '@renderer/context/FileTransfer'
 import styles from './StemGrid.module.css'
+
+const cardVariants = {
+  hidden:  { opacity: 0, y: 14, scale: 0.96 },
+  visible: { opacity: 1, y: 0,  scale: 1    },
+  exit:    { opacity: 0, y: 8,  scale: 0.97 },
+}
+const cardSpring = { type: 'spring' as const, stiffness: 320, damping: 24 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -190,14 +198,11 @@ function StemCard({ file, fromTool, index }: StemCardProps): JSX.Element {
   }, [file, fromTool, navigate, setPending])
 
   return (
-    <div
+    <motion.div
       className={`${styles.card}${playing ? ` ${styles.cardPlaying}` : ''}`}
-      style={{
-        '--stem-color': color,
-        '--stem-dim':   dim,
-        '--stem-tint':  tint,
-        animationDelay: `${index * 65}ms`,
-      } as React.CSSProperties}
+      style={{ '--stem-color': color, '--stem-dim': dim, '--stem-tint': tint } as React.CSSProperties}
+      variants={cardVariants}
+      transition={{ ...cardSpring, delay: Math.min(index, 10) * 0.055 }}
     >
       {/* Hidden audio element */}
       <audio
@@ -313,7 +318,7 @@ function StemCard({ file, fromTool, index }: StemCardProps): JSX.Element {
           → DAW
         </button>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -334,9 +339,11 @@ export function StemGrid({ files, fromTool, onClear }: Props): JSX.Element | nul
         )}
       </div>
       <div className={styles.grid}>
-        {files.map((f, i) => (
-          <StemCard key={f.path} file={f} fromTool={fromTool} index={i} />
-        ))}
+        <AnimatePresence initial={false}>
+          {files.map((f, i) => (
+            <StemCard key={f.path} file={f} fromTool={fromTool} index={i} />
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )

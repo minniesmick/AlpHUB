@@ -18,7 +18,10 @@ import type { PaletteItem } from './paletteNodes'
 import { endpoints } from '@renderer/lib/api'
 import { useFileTransfer } from '@renderer/context/FileTransfer'
 import { useToast } from '@renderer/context/Toast'
+import { AnimatePresence } from 'motion/react'
 import styles from './SignalFlow.module.css'
+import { PageTransition } from '@renderer/components/PageTransition'
+import { SignalFlowBg } from './components/SignalFlowBg'
 
 const GRAPH_KEY  = 'alphub_signalflow_graph_v1'
 const CONFIG_KEY = 'alphub_stream_config_v1'
@@ -175,7 +178,9 @@ export default function SignalFlowView(): JSX.Element {
   }, [streamConfig])
 
   return (
-    <div className={styles.view}>
+    <PageTransition>
+      <div className={styles.view}>
+      <SignalFlowBg />
       {/* Toolbar */}
       <div className={styles.topbar}>
         <TransportBar config={streamConfig} onDeviceChange={onTransportDeviceChange} />
@@ -231,31 +236,41 @@ export default function SignalFlowView(): JSX.Element {
           />
 
           {/* Floating panels (positioned absolute inside canvasCol) */}
-          {presetOpen && (
-            <PresetBrowser
-              onClose={closePreset}
-              onLoad={loadPreset}
-              currentNodes={nodes}
-              currentEdges={edges}
-            />
-          )}
+          <AnimatePresence>
+            {presetOpen && (
+              <PresetBrowser
+                key="preset"
+                onClose={closePreset}
+                onLoad={loadPreset}
+                currentNodes={nodes}
+                currentEdges={edges}
+              />
+            )}
+          </AnimatePresence>
 
-          {deviceOpen && (
-            <DeviceManager
-              onClose={closeDevice}
-              onApply={applyDevice}
-            />
-          )}
+          <AnimatePresence>
+            {deviceOpen && (
+              <DeviceManager
+                key="device"
+                onClose={closeDevice}
+                onApply={applyDevice}
+              />
+            )}
+          </AnimatePresence>
 
-          {selectedNode && (
-            <NodeInspector
-              node={selectedNode}
-              onClose={closeInspector}
-              onParamChange={onParamChange}
-            />
-          )}
+          <AnimatePresence>
+            {selectedNode && (
+              <NodeInspector
+                key="inspector"
+                node={selectedNode}
+                onClose={closeInspector}
+                onParamChange={onParamChange}
+              />
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
+    </PageTransition>
   )
 }

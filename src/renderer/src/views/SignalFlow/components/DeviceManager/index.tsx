@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'motion/react'
 import { X } from 'lucide-react'
 import { endpoints } from '@renderer/lib/api'
 import type { DevicesResult } from '@renderer/lib/api'
 import { useEscapeKey } from '@renderer/hooks/useEscapeKey'
 import { DeviceSelect } from '@renderer/components/DeviceSelect'
 import styles from './DeviceManager.module.css'
+
+const panelVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: -14 },
+  visible: { opacity: 1, scale: 1, y: 0 },
+  exit:   { opacity: 0, scale: 0.95, y: -10 },
+}
+const panelSpring = { type: 'spring' as const, stiffness: 280, damping: 22 }
 
 const SAMPLE_RATES = ['44100', '48000', '88200', '96000']
 const BUFFER_SIZES = ['64', '128', '256', '512', '1024']
@@ -36,7 +44,17 @@ export function DeviceManager({ onClose, onApply }: Props): JSX.Element {
   }
 
   return (
-    <div className={styles.panel} role="dialog" aria-label="Device manager" aria-modal="false">
+    <motion.div
+      className={styles.panel}
+      role="dialog"
+      aria-label="Device manager"
+      aria-modal="false"
+      variants={panelVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      transition={panelSpring}
+    >
       <div className={styles.header}>
         <span className={styles.title}>ASIO Device</span>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close device manager">
@@ -117,6 +135,6 @@ export function DeviceManager({ onClose, onApply }: Props): JSX.Element {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -1,7 +1,6 @@
 /* ── StemGrid ─────────────────────────────────────────────────────────────── */
 
 .root {
-  animation: slide-up 0.28s var(--ease-spring) both;
 }
 
 .header {
@@ -59,7 +58,6 @@
   border-top: 2px solid var(--stem-dim);
   border-radius: var(--radius-lg);
   background: var(--surface-2);
-  animation: slide-up 0.32s var(--ease-spring) both;
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 

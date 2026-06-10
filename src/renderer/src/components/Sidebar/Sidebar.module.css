@@ -62,22 +62,24 @@
   box-shadow: var(--glow-primary-sm), inset 0 0 0 1px var(--primary-glow);
 }
 
-/* Left gradient bar — visible only when active */
-.activeBar {
+/* List item wrapper — provides positioning context for the indicator */
+.navLi {
+  position: relative;
+  list-style: none;
+}
+
+/* Sliding indicator — left edge bar animated via Motion layoutId */
+.indicator {
   position: absolute;
-  left: -7px;   /* sits in the 1px sidebar border zone */
+  left: -7px;
   top: 50%;
-  transform: translateY(-50%) scaleY(0);
-  transform-origin: center;
+  transform: translateY(-50%);
   width: 3px;
   height: 20px;
   border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
   background: var(--gradient-accent-v);
-  transition: transform var(--dur-fast) var(--ease-spring);
-}
-
-.navItem.active .activeBar {
-  transform: translateY(-50%) scaleY(1);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* ── Stream active indicator ─────────────────────────────────────────────── */

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { motion } from 'motion/react'
 import { X } from 'lucide-react'
 import type { Node } from '@xyflow/react'
 import { SpectrumCanvas } from '@renderer/components/SpectrumCanvas'
@@ -8,6 +9,13 @@ import { endpoints } from '@renderer/lib/api'
 import type { NodeCardData } from '../../nodes/NodeCard'
 import { useEscapeKey } from '@renderer/hooks/useEscapeKey'
 import styles from './NodeInspector.module.css'
+
+const panelVariants = {
+  hidden:  { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+  exit:    { opacity: 0, y: 16 },
+}
+const panelSpring = { type: 'spring' as const, stiffness: 280, damping: 22 }
 
 interface Props {
   node:          Node | null
@@ -40,7 +48,16 @@ export function NodeInspector({ node, onClose, onParamChange }: Props): JSX.Elem
   const params = data.params ?? []
 
   return (
-    <div className={styles.panel} role="region" aria-label={`Node inspector: ${data.label}`}>
+    <motion.div
+      className={styles.panel}
+      role="region"
+      aria-label={`Node inspector: ${data.label}`}
+      variants={panelVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      transition={panelSpring}
+    >
       <div className={styles.header}>
         <span className={styles.nodeType}>{data.nodeType ?? 'effect'}</span>
         <span className={styles.nodeName}>{data.label}</span>
@@ -106,6 +123,6 @@ export function NodeInspector({ node, onClose, onParamChange }: Props): JSX.Elem
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

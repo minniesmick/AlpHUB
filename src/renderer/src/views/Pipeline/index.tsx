@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { motion } from 'motion/react'
 import { ChevronDown, Check, Play, X } from 'lucide-react'
 import { FileDropZone } from '@renderer/components/FileDropZone'
 import { ModelSelector } from '@renderer/components/ModelSelector'
@@ -20,6 +21,7 @@ import { ProfileCreationSheet }   from './components/ProfileCreationSheet'
 import { MicButton }              from './components/MicButton'
 import { PipelineBg }             from './components/PipelineBg'
 import styles from './Pipeline.module.css'
+import { PageTransition } from '@renderer/components/PageTransition'
 
 interface OutputFile { path: string; filename: string; createdAt?: number }
 interface BatchItem  { job_id: string; filename: string; progress: number; status: 'queued' | 'running' | 'done' | 'error' }
@@ -696,7 +698,8 @@ export default function PipelineView(): JSX.Element {
   }, [canRun, isRunning])
 
   return (
-    <div className={styles.view}>
+    <PageTransition>
+      <div className={styles.view}>
       <PipelineBg />
 
       <div className={styles.toolbar}>
@@ -982,14 +985,16 @@ export default function PipelineView(): JSX.Element {
               Cancel
             </button>
           )}
-          <button
+          <motion.button
             className={styles.runBtn}
             onClick={run}
             disabled={!canRun}
             title={disabledReason || undefined}
+            whileTap={canRun ? { scale: 0.94 } : undefined}
+            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
           >
             {isRunning ? 'Running…' : 'Run'}
-          </button>
+          </motion.button>
         </div>
 
         {lastAudio && (
@@ -1013,5 +1018,6 @@ export default function PipelineView(): JSX.Element {
         onCreate={createProfile}
       />
     </div>
+    </PageTransition>
   )
 }

@@ -1,8 +1,16 @@
 import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useFileTransfer } from '@renderer/context/FileTransfer'
 import styles from './OutputFileList.module.css'
+
+const itemVariants = {
+  hidden:  { opacity: 0, x: 14, scale: 0.98 },
+  visible: { opacity: 1, x: 0,  scale: 1    },
+  exit:    { opacity: 0, x: 14, scale: 0.97 },
+}
+const itemSpring = { type: 'spring' as const, stiffness: 340, damping: 26 }
 
 interface OutputFile {
   path:      string
@@ -98,11 +106,20 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
         )}
       </div>
       <div className={styles.list}>
-        {files.map(f => {
+        <AnimatePresence initial={false}>
+        {files.map((f, idx) => {
           const isText  = isTextFile(f.filename)
           const isOpen  = expanded.has(f.path)
           return (
-            <div key={f.path} className={styles.itemWrap}>
+            <motion.div
+              key={f.path}
+              className={styles.itemWrap}
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ ...itemSpring, delay: Math.min(idx, 8) * 0.04 }}
+            >
               <div className={styles.item}>
                 <span className={styles.filename}>{f.filename}</span>
                 {f.createdAt && (
@@ -170,9 +187,10 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
                   )}
                 </div>
               )}
-            </div>
+            </motion.div>
           )
         })}
+        </AnimatePresence>
       </div>
     </div>
   )

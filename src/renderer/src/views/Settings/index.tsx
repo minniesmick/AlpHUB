@@ -5,6 +5,7 @@ import { useSettings } from '@renderer/context/Settings'
 import { useToast } from '@renderer/context/Toast'
 import { ConfirmDialog } from '@renderer/components/ConfirmDialog'
 import styles from './Settings.module.css'
+import { PageTransition } from '@renderer/components/PageTransition'
 
 type Tab = 'audio' | 'paths' | 'profiles'
 
@@ -286,7 +287,8 @@ export default function SettingsView(): JSX.Element {
   const [tab, setTab] = useState<Tab>('audio')
 
   return (
-    <div className={styles.view}>
+    <PageTransition>
+      <div className={styles.view}>
       <nav className={styles.subnav} aria-label="Settings sections">
         {TABS.map(t => (
           <button
@@ -306,5 +308,6 @@ export default function SettingsView(): JSX.Element {
         {tab === 'profiles' && <ProfilesPanel />}
       </div>
     </div>
+    </PageTransition>
   )
 }

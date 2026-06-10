@@ -1,5 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useRef, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence } from 'motion/react'
 import Sidebar from '../Sidebar'
 import GpuStatusBar from '../GpuStatusBar'
 import { ToastStack } from '../ToastStack'
@@ -35,6 +36,7 @@ export default function AppShell(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false)
   const toast    = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const closeHelp = useCallback(() => setHelpOpen(false), [])
 
@@ -80,7 +82,9 @@ export default function AppShell(): JSX.Element {
           <Sidebar />
         </aside>
         <main className={styles.content} ref={contentRef}>
-          <Outlet />
+          <AnimatePresence mode="wait" initial={false}>
+            <Outlet key={location.pathname.split('/')[1]} />
+          </AnimatePresence>
         </main>
         <div className={styles.statusbar}>
           <GpuStatusBar />

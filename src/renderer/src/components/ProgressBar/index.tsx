@@ -1,3 +1,5 @@
+import { motion, useSpring, useTransform } from 'motion/react'
+import { useEffect } from 'react'
 import styles from './ProgressBar.module.css'
 
 interface Props {
@@ -13,8 +15,14 @@ function fmtEta(seconds: number): string {
   return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`
 }
 
+const FILL_SPRING = { stiffness: 60, damping: 20, mass: 0.8 }
+
 export function ProgressBar({ value, label, eta, animated = true, className }: Props) {
-  const pct = Math.max(0, Math.min(100, value))
+  const pct    = Math.max(0, Math.min(100, value))
+  const spring = useSpring(pct / 100, FILL_SPRING)
+  const scaleX = useTransform(spring, v => v)
+
+  useEffect(() => { spring.set(pct / 100) }, [pct, spring])
 
   return (
     <div className={`${styles.root}${className ? ` ${className}` : ''}`}>
@@ -26,10 +34,16 @@ export function ProgressBar({ value, label, eta, animated = true, className }: P
           )}
         </div>
       )}
-      <div className={styles.track} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-        <div className={styles.fill} style={{ transform: `scaleX(${pct / 100})` }}>
+      <div
+        className={styles.track}
+        role="progressbar"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <motion.div className={styles.fill} style={{ scaleX }}>
           {animated && pct < 100 && <div className={styles.shimmer} />}
-        </div>
+        </motion.div>
       </div>
     </div>
   )

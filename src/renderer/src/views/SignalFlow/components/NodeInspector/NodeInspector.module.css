@@ -4,11 +4,13 @@
   left: 0;
   right: 0;
   height: var(--node-inspector-height);
-  background: var(--surface-2);
-  border-top: var(--edge-highlight);
+  background: rgba(13, 11, 22, 0.80);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-top: 1px solid rgba(199, 125, 255, 0.24);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  animation: slide-up 0.28s var(--ease-spring) both;
   z-index: var(--z-panel);
 }
 

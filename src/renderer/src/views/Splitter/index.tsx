@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { motion } from 'motion/react'
 import { FileDropZone } from '@renderer/components/FileDropZone'
 import { ProgressBar } from '@renderer/components/ProgressBar'
 import { endpoints } from '@renderer/lib/api'
@@ -9,6 +10,7 @@ import { useSettings } from '@renderer/context/Settings'
 import { StemGrid } from './components/StemGrid'
 import { SplitterBg } from './components/SplitterBg'
 import styles from './Splitter.module.css'
+import { PageTransition } from '@renderer/components/PageTransition'
 
 // ── Stem definitions ────────────────────────────────────────────────────────
 
@@ -224,7 +226,8 @@ export default function SplitterView(): JSX.Element {
   }, [canRun, isRunning])
 
   return (
-    <div className={styles.view}>
+    <PageTransition>
+      <div className={styles.view}>
       <SplitterBg />
 
       <div className={styles.toolbar}>
@@ -250,7 +253,7 @@ export default function SplitterView(): JSX.Element {
           <div className={styles.sectionLabel}>Model</div>
           <div className={styles.modelGroup} role="radiogroup" aria-label="Model">
             {MODELS.map(m => (
-              <div
+              <motion.div
                 key={m.id}
                 className={`${styles.modelCard}${modelId === m.id ? ` ${styles.selected}` : ''}`}
                 onClick={() => setModelId(m.id)}
@@ -258,10 +261,13 @@ export default function SplitterView(): JSX.Element {
                 aria-checked={modelId === m.id}
                 tabIndex={0}
                 onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setModelId(m.id)}
+                whileHover={{ y: -2, boxShadow: '0 8px 28px rgba(199,125,255,0.16)' }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 28 }}
               >
                 <div className={styles.modelName}>{m.name}</div>
                 <div className={styles.modelDesc}>{m.desc}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -346,13 +352,21 @@ export default function SplitterView(): JSX.Element {
               Cancel
             </button>
           )}
-          <button className={styles.runBtn} onClick={run} disabled={!canRun} title={disabledReason || undefined}>
+          <motion.button
+            className={styles.runBtn}
+            onClick={run}
+            disabled={!canRun}
+            title={disabledReason || undefined}
+            whileTap={canRun ? { scale: 0.94 } : undefined}
+            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+          >
             {jobId ? 'Running…' : 'Split'}
-          </button>
+          </motion.button>
         </div>
 
         <StemGrid files={outputs} fromTool="splitter" onClear={() => setOutputs([])} />
       </div>
     </div>
+    </PageTransition>
   )
 }

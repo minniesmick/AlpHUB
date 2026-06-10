@@ -19,7 +19,7 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   pointer-events: all;
-  animation: slide-up 0.28s var(--ease-spring) both;
+  cursor: grab;
 }
 
 /* Type variants: full border tint + bg tint, no side stripe */
@@ -42,15 +42,6 @@
   border-color: var(--primary-dim);
   background: color-mix(in srgb, var(--primary) 9%, var(--surface-3));
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--primary-glow);
-}
-
-/* Exit animation — higher specificity (2 classes) wins over .card entry */
-.card.exiting {
-  animation: toast-exit 0.2s var(--ease-in) forwards;
-}
-
-@keyframes toast-exit {
-  to { opacity: 0; transform: translateX(20px); }
 }
 
 /* ── Progress bar (shrinks over duration via scaleX) ─────────────────────── */

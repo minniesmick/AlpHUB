@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  /* Map AlpHUB tokens into Tailwind theme */
+  --color-void:        #09090F;
+  --color-surface-1:   #111119;
+  --color-surface-2:   #171724;
+  --color-surface-3:   #1E1E2E;
+  --color-surface-4:   #252535;
+
+  --color-primary:     #C77DFF;
+  --color-primary-dim: #C77DFF99;
+  --color-secondary:   #F72585;
+  --color-secondary-dim: #F7258599;
+
+  --color-text-primary:   #F0EFF8;
+  --color-text-secondary: #8A87A8;
+  --color-text-disabled:  #4A4760;
+
+  --color-border-default: #2C2C3E;
+  --color-border-strong:  #3E3E52;
+
+  --font-body: 'Inter Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', monospace;
+}

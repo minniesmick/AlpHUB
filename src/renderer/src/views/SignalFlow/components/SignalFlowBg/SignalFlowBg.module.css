@@ -1,0 +1,76 @@
+/* SignalFlowBg — aurora mesh: 3 soft orbs drifting on slow loops */
+
+.root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform, opacity;
+}
+
+/* Orb 1 — primary neon purple, top-left quadrant */
+.orb1 {
+  width: 560px;
+  height: 440px;
+  background: var(--primary, #C77DFF);
+  top: -12%;
+  left: -8%;
+  animation: aurora-1 20s -4s ease-in-out infinite;
+}
+
+/* Orb 2 — hot pink, bottom-right quadrant */
+.orb2 {
+  width: 500px;
+  height: 420px;
+  background: var(--secondary, #F72585);
+  bottom: -18%;
+  right: -10%;
+  animation: aurora-2 27s -10s ease-in-out infinite;
+}
+
+/* Orb 3 — deep indigo, centre-right */
+.orb3 {
+  width: 380px;
+  height: 360px;
+  background: #1E0637;
+  top: 30%;
+  left: 45%;
+  animation: aurora-3 33s -17s ease-in-out infinite;
+}
+
+@keyframes aurora-1 {
+  0%   { opacity: 0.07; transform: translate(0px,   0px)  scale(1.00); }
+  25%  { opacity: 0.11; transform: translate(55px,  36px) scale(1.07); }
+  55%  { opacity: 0.05; transform: translate(-34px, 72px) scale(0.93); }
+  80%  { opacity: 0.09; transform: translate(20px,  -20px) scale(1.04); }
+  100% { opacity: 0.07; transform: translate(0px,   0px)  scale(1.00); }
+}
+
+@keyframes aurora-2 {
+  0%   { opacity: 0.06; transform: translate(0px,   0px)   scale(1.00); }
+  30%  { opacity: 0.04; transform: translate(-64px, -48px) scale(1.10); }
+  60%  { opacity: 0.09; transform: translate(28px,  -76px) scale(0.90); }
+  85%  { opacity: 0.05; transform: translate(-20px,  30px) scale(1.05); }
+  100% { opacity: 0.06; transform: translate(0px,   0px)   scale(1.00); }
+}
+
+@keyframes aurora-3 {
+  0%   { opacity: 0.05; transform: translate(0px,   0px)  scale(1.00); }
+  40%  { opacity: 0.10; transform: translate(-48px, 58px) scale(1.14); }
+  70%  { opacity: 0.03; transform: translate(36px, -40px) scale(0.88); }
+  100% { opacity: 0.05; transform: translate(0px,   0px)  scale(1.00); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb { animation: none !important; }
+  .orb1 { opacity: 0.06; }
+  .orb2 { opacity: 0.05; }
+  .orb3 { opacity: 0.04; }
+}
