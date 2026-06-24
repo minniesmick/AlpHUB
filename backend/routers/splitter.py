@@ -56,12 +56,14 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
         # ── 2. Load + preprocess audio ────────────────────────────────────
         def load_audio():
             import torch
-            import soundfile as sf
             import torchaudio
+            from pedalboard.io import AudioFile
 
-            # Use soundfile directly — torchaudio 2.6+ requires torchcodec by default
-            data, sr = sf.read(payload.input_path, dtype='float32', always_2d=True)
-            wav = torch.from_numpy(data.T).contiguous()  # [channels, samples]
+            # pedalboard handles wav/flac/ogg/opus/mp3/mpeg/m4a/aac without ffmpeg
+            with AudioFile(payload.input_path) as f:
+                data = f.read(f.frames)  # [channels, samples] float32
+                sr   = f.samplerate
+            wav = torch.from_numpy(data).contiguous()
 
             # Ensure stereo
             if wav.shape[0] == 1:
@@ -107,7 +109,23 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
             sources = sources * peak        # re-normalize
             return sources.cpu()
 
-        sources = await asyncio.to_thread(separate, wav)
+        # Tick progress 28→80 while apply_model blocks (no native callback)
+        import threading
+        _done = threading.Event()
+        async def _ticker():
+            tick = 0
+            while not _done.is_set():
+                await asyncio.sleep(6)
+                tick += 1
+                pct = min(28 + tick * 4, 79)
+                await job.report_progress(pct, stage="Separating")
+        ticker = asyncio.ensure_future(_ticker())
+        try:
+            sources = await asyncio.to_thread(separate, wav)
+        finally:
+            _done.set()
+            ticker.cancel()
+
         await job.report_progress(82, stage="Exporting stems")
 
         # ── 4. Export stems ───────────────────────────────────────────────
@@ -177,14 +195,16 @@ async def merge_stems(payload: MergePayload):
     def do_merge():
         import torch
         import torchaudio
-        import soundfile as sf
+        from pedalboard.io import AudioFile
 
         waves: list = []
         target_sr: int | None = None
 
         for path in payload.input_paths:
-            data, sr = sf.read(path, dtype='float32', always_2d=True)
-            wav = torch.from_numpy(data.T).contiguous()
+            with AudioFile(path) as f:
+                data = f.read(f.frames)
+                sr   = f.samplerate
+            wav = torch.from_numpy(data).contiguous()
             if target_sr is None:
                 target_sr = sr
             elif sr != target_sr:

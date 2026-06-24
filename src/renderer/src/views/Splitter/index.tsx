@@ -262,13 +262,13 @@ export default function SplitterView(): JSX.Element {
       <div className={styles.body}>
         {/* Input file */}
         <FileDropZone
-          accept="audio/*,.wav,.mp3,.flac,.ogg,.opus,.m4a"
+          accept="audio/*,.wav,.mp3,.flac,.ogg,.opus,.m4a,.mpeg,.mp4,.aac,.3gp,.3gpp"
           file={inputFile}
           onFile={f => { setInputFile(f); setIncomingPath(null) }}
           onClear={() => { setInputFile(null); setIncomingPath(null) }}
           showClear={!!incomingPath}
           title={incomingPath ? `← ${incomingPath.split(/[\\/]/).pop()}` : 'Drop audio to split'}
-          subtitle={incomingPath ? 'From Pipeline · click × to clear' : 'wav · mp3 · flac · ogg · opus (WhatsApp)'}
+          subtitle={incomingPath ? 'From Pipeline · click × to clear' : 'wav · mp3 · flac · ogg · opus · m4a · mpeg (WhatsApp)'}
         />
 
         <div className={styles.divider} />
