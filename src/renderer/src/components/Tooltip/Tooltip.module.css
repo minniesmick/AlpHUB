@@ -8,9 +8,11 @@
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--surface-3);
-  border: 1px solid var(--border-strong);
-  border-radius: 5px;
+  background: var(--glass-l3-bg);
+  backdrop-filter: var(--glass-l3-blur);
+  -webkit-backdrop-filter: var(--glass-l3-blur);
+  border: 1px solid var(--glass-l3-border);
+  border-radius: var(--radius-md);
   padding: 3px 8px;
   font-family: var(--font-body);
   font-size: 11px;

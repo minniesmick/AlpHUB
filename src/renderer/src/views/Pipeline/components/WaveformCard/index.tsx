@@ -10,8 +10,12 @@
  */
 
 import { useRef, useState, useEffect, useId, useMemo, useCallback } from 'react'
+import { motion, useTransform, useMotionTemplate } from 'motion/react'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { ParameterSlider } from '@renderer/components/ParameterSlider'
+import { useSpotlight } from '@renderer/hooks/useSpotlight'
+import { ShineBorder } from '@/components/ui/shine-border'
+import { BorderBeam } from '@/components/ui/border-beam'
 import styles from './WaveformCard.module.css'
 
 // ── Mutual exclusion ─────────────────────────────────────────────────────────
@@ -161,8 +165,19 @@ export function WaveformCard({ src, filename, mode }: Props): JSX.Element {
   const displayName = filename ?? src.split(/[\\/]/).pop() ?? 'audio'
   const badge       = mode?.toUpperCase()
 
+  const spot              = useSpotlight()
+  const spotOpacityScaled = useTransform(spot.spotOpacity, o => o * 0.07)
+  const spotBg            = useMotionTemplate`radial-gradient(240px circle at ${spot.spotX}px ${spot.spotY}px, rgba(199, 125, 255, ${spotOpacityScaled}), transparent 80%)`
+
   return (
-    <div className={styles.card}>
+    <motion.div
+      className={styles.card}
+      style={{ backgroundImage: spotBg }}
+      onMouseMove={spot.onMouseMove}
+      onMouseLeave={spot.onMouseLeave}
+    >
+      <ShineBorder borderWidth={1} duration={8} shineColor={['#C77DFF', '#F72585']} />
+      <BorderBeam size={70} duration={10} colorFrom="#C77DFF" colorTo="#F72585" />
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {/* Header row */}
@@ -256,6 +271,6 @@ export function WaveformCard({ src, filename, mode }: Props): JSX.Element {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

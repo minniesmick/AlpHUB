@@ -9,6 +9,8 @@ declare global {
       showItemInFolder: (filePath: string) => void
       notifyJobDone: (title: string, body: string) => void
       readTextFile: (filePath: string) => Promise<string>
+      openExternal: (url: string) => void
+      openPath: (filePath: string) => void
     }
   }
 }

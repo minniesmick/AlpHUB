@@ -19,7 +19,7 @@
 
 <img src="./alp_hub_icon.png" alt="AlpHUB Icon" width="48" />
 
-> AlpHUB is a dark-studio desktop app that puts three GPU-powered audio tools in one window — a node-based signal processor, a speech/voice pipeline, and a stem splitter — all running 100% locally with no cloud, no subscriptions, and no latency tax.
+> AlpHUB is a dark-studio desktop app that puts GPU-powered audio tools, a system monitor, and local image generation launchers in one window — running 100% locally with no cloud, no subscriptions, and no latency tax.
 
 </div>
 
@@ -28,7 +28,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Tools](#tools)
+- [Views](#views)
 - [Screenshots](#screenshots)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
@@ -53,7 +53,7 @@ AlpHUB is a personal-use Electron desktop app built around a FastAPI backend tha
 
 ---
 
-## Tools
+## Views
 
 ### Signal Flow
 
@@ -99,6 +99,35 @@ Source separation using Demucs — splits a mixed track into individual stems.
 - StemGrid — listen and send individual stems to Pipeline with one click
 - Drag-and-drop audio files or receive from Pipeline/Signal Flow via file transfer
 
+### System Monitor
+
+Real-time hardware metrics dashboard polling at 2-second intervals.
+
+- CPU, RAM, GPU usage as animated SVG ring meters with spring physics
+- 60-point rolling sparkline history per metric (canvas-rendered)
+- GPU card: VRAM bar, temperature with color shift (green → purple → pink)
+- Network I/O: dual sparklines (recv/sent), MB delta per poll interval
+- Disk C: usage bar with spring-animated fill
+
+### Projects
+
+Git repository browser for a configured root directory.
+
+- Scans root dir for `.git` repos on mount + manual rescan
+- Per-project: name, detected language (by file extension count), branch, last commit hash + message + relative date
+- Filter by name / language / branch
+- Open in VS Code (`vscode://file/`) or Windows Explorer with one click
+- Configurable root path — edit inline in the toolbar bar
+
+### Image Generation
+
+Status dashboard for locally running AI image generation servers.
+
+- Monitors ports 7865 (Fooocus), 8188 (ComfyUI), 7860 (Forge) every 10 seconds
+- Online apps: pulsing green dot, active "Open in Browser" button
+- Offline apps: grayed out, button disabled
+- Auto-detected — start any supported app separately and AlpHUB picks it up
+
 ---
 
 ## Screenshots
@@ -113,6 +142,7 @@ Source separation using Demucs — splits a mixed track into individual stems.
 |-------|-----------|
 | Desktop shell | Electron 31 |
 | Frontend | React 18, Vite 5, CSS Modules, electron-vite |
+| Animation | motion v12 (spring physics, AnimatePresence, layoutId, useSpring) |
 | Node graph | @xyflow/react 12 |
 | Icons | Lucide React |
 | Backend | FastAPI, Uvicorn, Python 3.11 |
@@ -122,6 +152,7 @@ Source separation using Demucs — splits a mixed track into individual stems.
 | Audio I/O | sounddevice (ASIO), soundfile |
 | DSP / Effects | pedalboard (Spotify) |
 | LLM | Ollama (local HTTP proxy) |
+| System metrics | psutil + pynvml (NVIDIA GPU via NVML) |
 | Fonts | Inter Variable, JetBrains Mono Variable |
 
 **Communication channels:**
@@ -295,6 +326,7 @@ Interactive docs (while backend running): `http://localhost:8765/docs`
 |--------|------|-------------|
 | GET | `/health` | Backend + WS client count |
 | GET | `/api/system` | Python version, CUDA status, VRAM |
+| GET | `/api/system/metrics` | Live CPU/RAM/GPU/Disk/Net metrics (psutil + pynvml) |
 | GET | `/api/models` | Scan model dirs, return grouped list |
 | POST | `/api/models/rescan` | Force re-scan with optional custom root |
 | GET | `/api/daw/devices` | List ASIO input/output devices |
@@ -306,6 +338,9 @@ Interactive docs (while backend running): `http://localhost:8765/docs`
 | POST | `/api/splitter/run` | Queue Demucs stem split job |
 | GET | `/api/ollama/status` | Check Ollama running on :11434 |
 | GET | `/api/ollama/models` | List available Ollama models |
+| GET | `/api/projects` | Scan directory for git repos, returns metadata |
+| GET | `/api/imagegen/status` | Check ports 7865/8188/7860 for running AI image apps |
+| POST | `/api/imagegen/open` | Open image gen app URL in default browser |
 
 ---
 
@@ -414,16 +449,25 @@ AlpHUB/
 │           │   │       ├── TypewriterCard/
 │           │   │       ├── OutputFileList/
 │           │   │       └── ProfileCreationSheet/
-│           │   └── Splitter/       # Stem separation
-│           │       └── components/
-│           │           └── StemGrid/
+│           │   ├── Splitter/       # Stem separation
+│           │   │   └── components/
+│           │   │       └── StemGrid/
+│           │   ├── Monitor/        # System metrics dashboard (CPU/RAM/GPU/Net/Disk)
+│           │   ├── Projects/       # Git repo browser with IDE launch
+│           │   └── ImageGen/       # Local AI image generation launcher
 │           ├── components/         # Shared UI components
-│           │   ├── AppShell/       # Navigation, layout root
+│           │   ├── AppShell/       # Navigation, layout root, keyboard shortcuts
+│           │   ├── CinematicOverlay/ # Route transition: letterbox + scan sweep
+│           │   ├── PageTransition/ # Per-page zoom+blur rack-focus entrance/exit
+│           │   ├── Sidebar/        # Nav icons with layoutId sliding indicator
 │           │   ├── DeviceSelect/   # Custom ASIO device dropdown
 │           │   ├── FileDropZone/   # Drag-and-drop audio input
 │           │   ├── ModelSelector/  # Model picker dropdown
 │           │   ├── ParameterSlider/
-│           │   └── ProgressBar/
+│           │   ├── ProgressBar/    # Spring-animated fill bar
+│           │   ├── SpectrumCanvas/ # FFT bars with peak hold + glow
+│           │   ├── ToastStack/     # Drag-to-dismiss spring toast stack
+│           │   └── HelpModal/      # Keyboard shortcut reference
 │           ├── context/
 │           │   ├── Settings.tsx    # App settings (localStorage)
 │           │   ├── Toast.tsx       # Toast notification system
@@ -443,6 +487,9 @@ AlpHUB/
 │   │   ├── pipeline.py             # STT/TTS/STS/TTT job runner
 │   │   ├── splitter.py             # Demucs stem split job runner
 │   │   ├── ollama.py               # Ollama proxy
+│   │   ├── system.py               # CPU/RAM/GPU/Disk/Net metrics (psutil+pynvml)
+│   │   ├── projects.py             # Git repo scanner
+│   │   ├── imagegen.py             # Image gen app port watcher
 │   │   └── utils.py                # File read, misc
 │   └── services/
 │       ├── job_queue.py            # Async GPU-serialized job queue
@@ -470,6 +517,9 @@ AlpHUB/
 - [ ] Export / import Signal Flow presets as shareable JSON
 - [ ] Settings: configurable venv path (remove hardcoded `D:\AI_Ortak_Venv`)
 - [ ] Portable build with bundled Python backend
+- [ ] Projects view: open in other IDEs (Cursor, Zed) + configurable IDE list
+- [ ] Monitor view: process list — top N by CPU/RAM, kill button
+- [ ] Image gen: per-app settings shortcut (open ComfyUI workflows folder etc.)
 
 ---
 

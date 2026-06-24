@@ -1,16 +1,18 @@
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, FileOutput } from 'lucide-react'
 import { useFileTransfer } from '@renderer/context/FileTransfer'
+import { LIST_SPRING } from '@renderer/lib/motion'
+import { EmptyState } from '@renderer/components/EmptyState'
 import styles from './OutputFileList.module.css'
 
 const itemVariants = {
   hidden:  { opacity: 0, x: 14, scale: 0.98 },
   visible: { opacity: 1, x: 0,  scale: 1    },
-  exit:    { opacity: 0, x: 14, scale: 0.97 },
+  exit:    { opacity: 0, x: 14, scale: 0.97, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } },
 }
-const itemSpring = { type: 'spring' as const, stiffness: 340, damping: 26 }
+const itemSpring = LIST_SPRING
 
 interface OutputFile {
   path:      string
@@ -77,7 +79,15 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
     }
   }, [expanded, previews, loadingP])
 
-  if (files.length === 0) return null
+  if (files.length === 0) {
+    return (
+      <EmptyState
+        icon={<FileOutput size={20} />}
+        title="No output files yet"
+        description="Run a job to see results here"
+      />
+    )
+  }
 
   const handleSend = (file: OutputFile, route: string) => {
     setPending({ path: file.path, filename: file.filename, fromTool })
@@ -105,7 +115,7 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
           </button>
         )}
       </div>
-      <div className={styles.list}>
+      <motion.div className={styles.list} layout>
         <AnimatePresence initial={false}>
         {files.map((f, idx) => {
           const isText  = isTextFile(f.filename)
@@ -118,6 +128,7 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
               initial="hidden"
               animate="visible"
               exit="exit"
+              layout
               transition={{ ...itemSpring, delay: Math.min(idx, 8) * 0.04 }}
             >
               <div className={styles.item}>
@@ -191,7 +202,7 @@ export function OutputFileList({ files, fromTool, onClear }: Props): JSX.Element
           )
         })}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </div>
   )
 }

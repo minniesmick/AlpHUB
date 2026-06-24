@@ -4,14 +4,28 @@
   right: 0;
   bottom: 0;
   width: var(--palette-width);
-  background: rgba(13, 11, 22, 0.82);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border-left: 1px solid rgba(199, 125, 255, 0.16);
+  background: var(--glass-l1-bg);
+  backdrop-filter: var(--glass-l1-blur);
+  -webkit-backdrop-filter: var(--glass-l1-blur);
+  border-left: 1px solid var(--glass-l1-border);
   box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
   z-index: var(--z-panel);
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
 }
 
 .header {
@@ -35,7 +49,7 @@
 .closeBtn {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-default);
   background: transparent;
   color: var(--text-secondary);
@@ -59,7 +73,7 @@
   height: 28px;
   background: var(--surface-2);
   border: 1px solid var(--border-default);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   padding: 0 var(--space-3);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -166,7 +180,7 @@
   height: 28px;
   background: var(--surface-2);
   border: 1px solid var(--border-default);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   padding: 0 var(--space-3);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -181,7 +195,7 @@
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--primary-dim);
   background: var(--primary-tint);
   color: var(--primary);

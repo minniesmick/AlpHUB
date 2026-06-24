@@ -15,6 +15,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Geist';
+  src: url('../assets/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../assets/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
 
   /* ── Elevation ──────────────────────────────────────────────────────────── */
@@ -38,19 +54,37 @@
   --text-on-accent: #FFFFFF;
 
   /* ── Accent — LOCKED ────────────────────────────────────────────────────── */
-  --primary:        #C77DFF;
-  --primary-dim:    #C77DFF99;
-  --primary-tint:   #C77DFF18;
-  --primary-active: #C77DFF28;
-  --primary-glow:   #C77DFF33;
-  --primary-deep:   #7B3FCC;
+  --primary:             #C77DFF;
+  --primary-dim:         #C77DFF99;
+  --primary-tint:        #C77DFF18;
+  --primary-active:      #C77DFF28;
+  --primary-glow:        #C77DFF33;
+  --primary-deep:        #7B3FCC;
+  --primary-foreground:  #FFFFFF;
 
-  --secondary:       #F72585;
-  --secondary-dim:   #F7258599;
-  --secondary-tint:  #F7258514;
-  --secondary-active:#F7258520;
-  --secondary-glow:  #F7258533;
-  --secondary-deep:  #A0196A;
+  --secondary:             #F72585;
+  --secondary-dim:         #F7258599;
+  --secondary-tint:        #F7258514;
+  --secondary-active:      #F7258520;
+  --secondary-glow:        #F7258533;
+  --secondary-deep:        #A0196A;
+  --secondary-foreground:  #FFFFFF;
+
+  /* shadcn semantic aliases */
+  --background:         var(--void);
+  --foreground:         var(--text-primary);
+  --card:               var(--surface-2);
+  --card-foreground:    var(--text-primary);
+  --popover:            var(--surface-3);
+  --popover-foreground: var(--text-primary);
+  --muted:              var(--surface-3);
+  --muted-foreground:   var(--text-secondary);
+  --accent-bg:          var(--surface-4);
+  --accent-foreground:  var(--text-primary);
+  --destructive:        var(--error);
+  --destructive-foreground: var(--text-on-accent);
+  --input:              var(--border-default);
+  --ring:               var(--primary);
 
   --gradient-accent:        linear-gradient(135deg, #C77DFF 0%, #F72585 100%);
   --gradient-accent-h:      linear-gradient(90deg,  #C77DFF 0%, #F72585 100%);
@@ -63,7 +97,9 @@
   --warning:       #F5A623;
   --warning-tint:  #F5A62318;
   --error:         #F72585;
+  --error-dim:     #F7258599;
   --error-tint:    #F7258514;
+  --error-glow:    #F7258533;
   --info:          #60B4FF;
   --info-tint:     #60B4FF14;
   /* Source node / stream-active indicator */
@@ -85,12 +121,14 @@
   --glow-secondary: var(--glow-secondary-sm);
 
   /* ── Typography ─────────────────────────────────────────────────────────── */
-  --font-display: 'Satoshi', 'Inter Variable', system-ui, sans-serif;
-  --font-body:    'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-display: 'Satoshi', 'Geist', 'Inter Variable', system-ui, sans-serif;
+  --font-body:    'Geist', 'Inter Variable', 'Inter', system-ui, sans-serif;
   --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', monospace;
+  --font-mono-ui: 'Geist Mono', 'JetBrains Mono Variable', monospace;
+  --font-mono-data: 'JetBrains Mono Variable', 'JetBrains Mono', monospace;
 
-  --text-xs:   11px;
-  --text-sm:   12px;
+  --text-xs:   12px;
+  --text-sm:   13px;
   --text-base: 14px;
   --text-md:   16px;
   --text-lg:   20px;
@@ -125,12 +163,19 @@
   --space-12:  48px;
   --space-16:  64px;
 
+  /* ── Semantic spacing ───────────────────────────────────────────────────── */
+  --content-padding: var(--space-5);   /* 20px — view body / scroll area */
+  --card-pad:        var(--space-4);   /* 16px — card / panel inner */
+  --card-pad-sm:     var(--space-3);   /* 12px — compact card / chip area */
+
   /* ── Radius ─────────────────────────────────────────────────────────────── */
   --radius-xs:   2px;
   --radius-sm:   4px;
   --radius-md:   6px;
   --radius-lg:   8px;
   --radius-xl:   12px;
+  --radius-2xl:  20px;
+  --radius-3xl:  32px;
   --radius-pill: 9999px;
 
   /* ── Motion ─────────────────────────────────────────────────────────────── */
@@ -174,11 +219,33 @@
   --z-modal-backdrop: 68;   /* darkens everything behind a true modal */
   --z-modal:          70;
   --z-tooltip:        80;
+  --z-cinematic:      200;
 
   /* ── Icon sizes ─────────────────────────────────────────────────────────── */
   --icon-sm: 16px;
   --icon-md: 18px;
   --icon-lg: 20px;
+
+  /* ── Glass depth layers ─────────────────────────────────────────────────── */
+  /* L1 — floating panels (DeviceManager, NodeInspector, PresetBrowser) */
+  --glass-l1-bg:     rgba(13, 11, 22, 0.78);
+  --glass-l1-blur:   blur(24px) saturate(160%);
+  --glass-l1-border: rgba(199, 125, 255, 0.18);
+  /* L2 — nested panels / drawers */
+  --glass-l2-bg:     rgba(17, 17, 25, 0.85);
+  --glass-l2-blur:   blur(16px) saturate(140%);
+  --glass-l2-border: rgba(199, 125, 255, 0.12);
+  /* L3 — tooltips / menus */
+  --glass-l3-bg:     rgba(25, 25, 38, 0.92);
+  --glass-l3-blur:   blur(8px) saturate(120%);
+  --glass-l3-border: rgba(199, 125, 255, 0.08);
+
+  /* ── Liquid Glass ───────────────────────────────────────────────────────── */
+  --glass-surface-bg:        rgba(14, 12, 24, 0.74);
+  --glass-surface-blur:      blur(32px) saturate(200%);
+  --glass-surface-border:    rgba(255, 255, 255, 0.07);
+  --glass-surface-leak:      rgba(199, 125, 255, 0.055);   /* top-left light leak */
+  --glass-surface-fallback:  var(--surface-2);              /* no-blur fallback */
 }
 
 /* ─── Keyframes ──────────────────────────────────────────────────────────── */
@@ -224,6 +291,55 @@
 @keyframes scale-in {
   from { transform: scale(0.93) translateY(4px); opacity: 0; }
   to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes border-rotate {
+  to { --border-angle: 360deg; }
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -24; }
+}
+
+/* ─── Liquid Glass utility ───────────────────────────────────────────────── */
+
+.glassSurface {
+  background: var(--glass-surface-bg);
+  backdrop-filter: var(--glass-surface-blur);
+  -webkit-backdrop-filter: var(--glass-surface-blur);
+  border: 1px solid var(--glass-surface-border);
+  position: relative;
+  isolation: isolate;
+}
+
+.glassSurface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.045) 0%,
+    var(--glass-surface-leak) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glassSurface {
+    background: var(--glass-surface-fallback);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .glassSurface::before { display: none; }
 }
 
 /* ─── Global base ────────────────────────────────────────────────────────── */

@@ -7,6 +7,40 @@
   background: var(--surface-2);
   overflow: hidden;
   animation: slide-up 0.32s var(--ease-spring) both;
+  position: relative;
+  isolation: isolate;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--border-angle),
+    rgba(199, 125, 255, 0),
+    rgba(199, 125, 255, 0.5) 12%,
+    rgba(247, 37, 133, 0.32) 30%,
+    rgba(199, 125, 255, 0) 45%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.card:hover::before {
+  opacity: 1;
+  animation: border-rotate 4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:hover::before { animation: none; }
 }
 
 .header {
@@ -58,7 +92,7 @@
 .waveform:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--primary), 0 0 10px color-mix(in srgb, var(--primary) 30%, transparent);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* Bar entrance animation */

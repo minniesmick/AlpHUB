@@ -3,8 +3,6 @@ import {
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
-  Background,
-  BackgroundVariant,
   Controls,
   type Node,
   type Edge,
@@ -13,9 +11,12 @@ import {
   type Connection,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { Workflow } from 'lucide-react'
 import { GradientEdge } from '../../edges/GradientEdge'
 import { NodeCard } from '../../nodes/NodeCard'
 import type { PaletteItem } from '../../paletteNodes'
+import { EmptyState } from '@renderer/components/EmptyState'
+import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern'
 import styles from './FlowCanvas.module.css'
 
 const edgeTypes = { gradient: GradientEdge }
@@ -53,7 +54,25 @@ function CanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onConnect, on
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
+      <AnimatedGridPattern
+        width={28}
+        height={28}
+        numSquares={18}
+        maxOpacity={0.06}
+        duration={3.5}
+        repeatDelay={1.2}
+        className={styles.gridPattern}
+      />
       <div className={styles.scanlines} aria-hidden="true" />
+      {nodes.length === 0 && (
+        <div className={styles.emptyOverlay} aria-hidden="true">
+          <EmptyState
+            icon={<Workflow size={22} />}
+            title="Empty canvas"
+            description="Drag nodes from the palette to build your signal flow"
+          />
+        </div>
+      )}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -68,7 +87,6 @@ function CanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onConnect, on
         proOptions={{ hideAttribution: true }}
         deleteKeyCode="Delete"
       >
-        <Background variant={BackgroundVariant.Dots} color="#3A2858" gap={24} size={1.4} />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>

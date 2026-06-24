@@ -19,7 +19,7 @@
 .bar {
   flex: 1;
   height: var(--maxH, 60px);
-  border-radius: 2px 2px 0 0;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
   /* Gradient fades to transparent at top — only the foot glows */
   background: linear-gradient(
     to top,

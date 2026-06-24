@@ -89,6 +89,14 @@ ipcMain.handle('show-item-in-folder', (_event, filePath: string) => {
   shell.showItemInFolder(filePath)
 })
 
+ipcMain.handle('open-external', (_event, url: string) => {
+  shell.openExternal(url)
+})
+
+ipcMain.handle('open-path', (_event, filePath: string) => {
+  shell.openPath(filePath)
+})
+
 // ── Text file reader (for clipboard copy) ─────────────────────────────────
 
 ipcMain.handle('read-text-file', async (_event, filePath: string) => {

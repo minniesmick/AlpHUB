@@ -1,10 +1,15 @@
 import { createContext, useContext, useCallback, useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence } from 'motion/react'
+import { Toaster } from 'sonner'
 import Sidebar from '../Sidebar'
 import GpuStatusBar from '../GpuStatusBar'
 import { ToastStack } from '../ToastStack'
 import { HelpModal } from '../HelpModal'
+import { CinematicOverlay } from '../CinematicOverlay'
+import { CursorGlow } from '../CursorGlow'
+import { CommandPalette, useCommandPalette } from '../CommandPalette'
+import { Particles } from '@/components/ui/particles'
 import styles from './AppShell.module.css'
 import { ws } from '../../lib/ws'
 import { useToast } from '../../context/Toast'
@@ -17,11 +22,13 @@ interface ShellDims {
 const ShellContext = createContext<ShellDims>({ contentWidth: 0, contentHeight: 0 })
 export const useShell = (): ShellDims => useContext(ShellContext)
 
-// Routes in order — Ctrl+1, Ctrl+2, Ctrl+3 navigate; Ctrl+, opens Settings
 const ROUTE_SHORTCUTS: Record<string, string> = {
   '1': '/daw',
   '2': '/pipeline',
   '3': '/splitter',
+  '4': '/monitor',
+  '5': '/projects',
+  '6': '/imagegen',
   ',': '/settings',
 }
 
@@ -34,6 +41,7 @@ export default function AppShell(): JSX.Element {
   const contentRef = useRef<HTMLElement>(null)
   const [dims, setDims] = useState<ShellDims>({ contentWidth: 0, contentHeight: 0 })
   const [helpOpen, setHelpOpen] = useState(false)
+  const cmdPalette = useCommandPalette()
   const toast    = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -78,6 +86,14 @@ export default function AppShell(): JSX.Element {
   return (
     <ShellContext.Provider value={dims}>
       <div className={styles.shell}>
+        <Particles
+          className={styles.particlesLayer}
+          quantity={35}
+          size={0.5}
+          color="#C77DFF"
+          staticity={80}
+          ease={60}
+        />
         <aside className={styles.sidebar}>
           <Sidebar />
         </aside>
@@ -85,12 +101,28 @@ export default function AppShell(): JSX.Element {
           <AnimatePresence mode="wait" initial={false}>
             <Outlet key={location.pathname.split('/')[1]} />
           </AnimatePresence>
+          <CinematicOverlay />
         </main>
         <div className={styles.statusbar}>
           <GpuStatusBar />
         </div>
         <ToastStack />
         <HelpModal open={helpOpen} onClose={closeHelp} />
+        <CursorGlow />
+        <CommandPalette open={cmdPalette.open} onClose={cmdPalette.close} />
+        <Toaster
+          theme="dark"
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: 'var(--surface-3)',
+              border:     '1px solid var(--border-default)',
+              color:      'var(--text-primary)',
+              fontFamily: 'var(--font-body)',
+              fontSize:   '13px',
+            },
+          }}
+        />
       </div>
     </ShellContext.Provider>
   )

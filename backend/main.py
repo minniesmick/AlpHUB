@@ -17,7 +17,7 @@ import json
 import logging
 
 from services.job_queue import gpu_queue
-from routers import models, daw, pipeline, splitter, ollama, utils
+from routers import models, daw, pipeline, splitter, ollama, utils, system, projects, imagegen
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("alphub")
@@ -38,6 +38,9 @@ app.include_router(pipeline.router, prefix="/api/pipeline", tags=["pipeline"])
 app.include_router(splitter.router, prefix="/api/splitter", tags=["splitter"])
 app.include_router(ollama.router,   prefix="/api/ollama",   tags=["ollama"])
 app.include_router(utils.router,    prefix="/api",          tags=["utils"])
+app.include_router(system.router,   prefix="/api/system",   tags=["system"])
+app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
+app.include_router(imagegen.router, prefix="/api/imagegen", tags=["imagegen"])
 
 
 # ── WebSocket connection manager ───────────────────────────────────────────

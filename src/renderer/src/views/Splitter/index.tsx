@@ -9,6 +9,12 @@ import { useToast } from '@renderer/context/Toast'
 import { useSettings } from '@renderer/context/Settings'
 import { StemGrid } from './components/StemGrid'
 import { SplitterBg } from './components/SplitterBg'
+import { BTN_SPRING } from '@renderer/lib/motion'
+import { Loader2 } from 'lucide-react'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
+import { useMagnetic } from '@renderer/hooks/useMagnetic'
+import { useParticleBurst } from '@renderer/hooks/useParticleBurst'
+import { ProcessingMarquee } from '@renderer/components/ProcessingMarquee'
 import styles from './Splitter.module.css'
 import { PageTransition } from '@renderer/components/PageTransition'
 
@@ -44,7 +50,7 @@ const MAX_SPLITTER_OUTPUTS = 100   // stems accumulate fast
 
 interface SplitterPrefs {
   modelId: string
-  format:  'wav' | 'flac'
+  format:  'wav' | 'flac' | 'mp3'
   checked: StemKey[]
 }
 
@@ -82,16 +88,21 @@ export default function SplitterView(): JSX.Element {
   const toast = useToast()
   const { settings } = useSettings()
   const { pending, setPending }   = useFileTransfer()
+  const runMagnetic = useMagnetic({ threshold: 80, strength: 0.35 })
+  const burst       = useParticleBurst()
+  const runBtnRef   = useRef<HTMLDivElement>(null)
   const [inputFile, setInputFile] = useState<File | null>(null)
   const [incomingPath, setIncomingPath] = useState<string | null>(null)
   const [modelId, setModelId]     = useState(() => loadSplitterPrefs().modelId)
   const [sixStem, setSixStem]     = useState(false)
   const [checked, setChecked]     = useState<Set<StemKey>>(() => new Set(loadSplitterPrefs().checked))
-  const [format, setFormat]       = useState<'wav' | 'flac'>(() => loadSplitterPrefs().format)
+  const [format, setFormat]       = useState<'wav' | 'flac' | 'mp3'>(() => loadSplitterPrefs().format)
   const [jobId, setJobId]         = useState<string | null>(null)
   const [progress, setProgress]   = useState(0)
   const [eta, setEta]             = useState<number | undefined>(undefined)
   const [outputs, setOutputs]     = useState<OutputFile[]>(loadSplitterOutputs)
+  const [jobGlow, setJobGlow]     = useState(false)
+  const prevOutputsLenRef         = useRef(outputs.length)
 
   // Pick up file transferred from another tool
   useEffect(() => {
@@ -115,6 +126,16 @@ export default function SplitterView(): JSX.Element {
     setChecked(prev => new Set([...prev].filter(s => availableStems.includes(s))))
   }, [sixStem]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (outputs.length > prevOutputsLenRef.current) {
+      setJobGlow(true)
+      const t = setTimeout(() => setJobGlow(false), 600)
+      prevOutputsLenRef.current = outputs.length
+      return () => clearTimeout(t)
+    }
+    prevOutputsLenRef.current = outputs.length
+  }, [outputs])
+
   // WS job events
   useEffect(() => {
     const unsubs = [
@@ -134,6 +155,9 @@ export default function SplitterView(): JSX.Element {
             createdAt: ts,
           }))
           setOutputs(prev => [...files, ...prev])
+          toast.success(`${files.length} stem${files.length !== 1 ? 's' : ''} extracted`)
+          const rect = runBtnRef.current?.getBoundingClientRect()
+          if (rect) burst(rect.left + rect.width / 2, rect.top + rect.height / 2)
           setJobId(null)
         }
       }),
@@ -141,7 +165,7 @@ export default function SplitterView(): JSX.Element {
         if (d.job_id === jobId) {
           setJobId(null)
           setProgress(0)
-          toast.error(`Split failed: ${d.error}`)
+          toast.error(`Stem split failed — ${d.error}`)
         }
       }),
       ws.on('job_cancelled', d => {
@@ -229,6 +253,7 @@ export default function SplitterView(): JSX.Element {
     <PageTransition>
       <div className={styles.view}>
       <SplitterBg />
+      <div className={styles.ambientOrb} />
 
       <div className={styles.toolbar}>
         <span className={styles.toolbarTitle}>Stem Splitter</span>
@@ -237,13 +262,13 @@ export default function SplitterView(): JSX.Element {
       <div className={styles.body}>
         {/* Input file */}
         <FileDropZone
-          accept="audio/*,.wav,.mp3,.flac,.ogg,.m4a"
+          accept="audio/*,.wav,.mp3,.flac,.ogg,.opus,.m4a"
           file={inputFile}
           onFile={f => { setInputFile(f); setIncomingPath(null) }}
           onClear={() => { setInputFile(null); setIncomingPath(null) }}
           showClear={!!incomingPath}
           title={incomingPath ? `← ${incomingPath.split(/[\\/]/).pop()}` : 'Drop audio to split'}
-          subtitle={incomingPath ? 'From Pipeline · click × to clear' : 'wav · mp3 · flac · ogg'}
+          subtitle={incomingPath ? 'From Pipeline · click × to clear' : 'wav · mp3 · flac · ogg · opus (WhatsApp)'}
         />
 
         <div className={styles.divider} />
@@ -315,7 +340,7 @@ export default function SplitterView(): JSX.Element {
         <div>
           <div className={styles.sectionLabel}>Format</div>
           <div className={styles.stemGrid}>
-            {(['wav', 'flac'] as const).map(f => (
+            {(['wav', 'flac', 'mp3'] as const).map(f => (
               <button
                 key={f}
                 className={`${styles.stemChip}${format === f ? ` ${styles.checked}` : ''}`}
@@ -329,7 +354,13 @@ export default function SplitterView(): JSX.Element {
         </div>
 
         {jobId && (
-          <ProgressBar value={progress} label="Splitting stems…" eta={eta} animated />
+          <>
+            <ProgressBar value={progress} label="Splitting stems…" eta={eta} animated />
+            <ProcessingMarquee
+              stages={['Loading demucs model', 'Separating sources', 'Extracting stems', 'Writing files']}
+              className={styles.marquee}
+            />
+          </>
         )}
 
         <div className={styles.runRow}>
@@ -352,19 +383,42 @@ export default function SplitterView(): JSX.Element {
               Cancel
             </button>
           )}
-          <motion.button
-            className={styles.runBtn}
-            onClick={run}
-            disabled={!canRun}
-            title={disabledReason || undefined}
-            whileTap={canRun ? { scale: 0.94 } : undefined}
-            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+          <motion.div
+            ref={runBtnRef}
+            style={{ x: runMagnetic.x, y: runMagnetic.y }}
+            onMouseMove={runMagnetic.onMouseMove}
+            onMouseLeave={runMagnetic.onMouseLeave}
+            whileHover={{ scale: 1.025, y: -1 }}
+            whileTap={{ scale: 0.94, y: 1 }}
           >
-            {jobId ? 'Running…' : 'Split'}
-          </motion.button>
+            <ShimmerButton
+              onClick={run}
+              disabled={!canRun || !!jobId}
+              shimmerColor="#ffffff"
+              shimmerSize="0.06em"
+              shimmerDuration="2.5s"
+              background="linear-gradient(135deg, #C77DFF 0%, #F72585 100%)"
+              borderRadius="var(--radius-md)"
+              className="h-9 px-5 text-sm font-bold tracking-wider font-display"
+            >
+              {!!jobId && <Loader2 size={13} className="animate-spin mr-1.5 inline-block" />}
+              {jobId ? 'Running…' : 'Split'}
+            </ShimmerButton>
+          </motion.div>
         </div>
 
-        <StemGrid files={outputs} fromTool="splitter" onClear={() => setOutputs([])} />
+        <motion.div
+          animate={{
+            scale: jobGlow ? [1, 1.008, 1] : 1,
+            boxShadow: jobGlow
+              ? ['0 0 0 0px rgba(199,125,255,0)', '0 0 0 1px rgba(199,125,255,0.45), 0 0 28px rgba(199,125,255,0.14)', '0 0 0 0px rgba(199,125,255,0)']
+              : '0 0 0 0px rgba(199,125,255,0)',
+          }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          style={{ borderRadius: 'var(--radius-xl)' }}
+        >
+          <StemGrid files={outputs} fromTool="splitter" onClear={() => setOutputs([])} />
+        </motion.div>
       </div>
     </div>
     </PageTransition>

@@ -24,9 +24,9 @@
 
 /* Type variants: full border tint + bg tint, no side stripe */
 .card.error   {
-  border-color: var(--secondary-dim);
-  background: color-mix(in srgb, var(--secondary) 9%, var(--surface-3));
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--secondary-glow);
+  border-color: var(--error-dim);
+  background: color-mix(in srgb, var(--error) 9%, var(--surface-3));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 14px var(--error-glow);
 }
 .card.success {
   border-color: color-mix(in srgb, var(--success) 45%, transparent);
@@ -55,7 +55,7 @@
   transform-origin: left center;
 }
 
-.error   .bar { background: var(--secondary); }
+.error   .bar { background: var(--error); }
 .success .bar { background: var(--success); }
 .warning .bar { background: var(--warning); }
 .info    .bar { background: var(--primary); }

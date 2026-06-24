@@ -16,7 +16,7 @@
   background: var(--surface-3);
   border: 1px solid var(--border-strong);
   border-top: 2px solid var(--primary-dim);
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   padding: var(--space-5) var(--space-6);
   width: 360px;
   max-width: calc(100vw - var(--space-8));
@@ -48,7 +48,7 @@
 .btn {
   height: 32px;
   padding: 0 var(--space-4);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   font-size: var(--text-xs);
   font-weight: 600;
   font-family: var(--font-body);

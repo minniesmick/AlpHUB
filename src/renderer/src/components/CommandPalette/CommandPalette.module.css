@@ -1,0 +1,52 @@
+/* Override shadcn Command dialog for AlpHUB cyberpunk theme */
+
+:global([cmdk-dialog] [cmdk-root]) {
+  background: var(--surface-3);
+  border: 1px solid var(--primary-glow);
+  box-shadow: var(--glow-primary-md), 0 32px 64px rgba(0, 0, 0, 0.6);
+}
+
+:global([cmdk-input-wrapper]) {
+  border-bottom-color: var(--border-default) !important;
+}
+
+:global([cmdk-input]) {
+  font-family: var(--font-body) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-primary) !important;
+}
+
+:global([cmdk-input]::placeholder) {
+  color: var(--text-disabled) !important;
+}
+
+:global([cmdk-group-heading]) {
+  font-family: var(--font-display) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--text-disabled) !important;
+}
+
+:global([cmdk-item]) {
+  font-family: var(--font-body) !important;
+  font-size: var(--text-sm) !important;
+  color: var(--text-secondary) !important;
+  border-radius: var(--radius-md) !important;
+  transition: background 0.08s, color 0.08s;
+}
+
+:global([cmdk-item][data-selected='true']) {
+  background: var(--primary-active) !important;
+  color: var(--primary) !important;
+}
+
+:global([cmdk-separator]) {
+  background: var(--border-subtle) !important;
+}
+
+:global([cmdk-empty]) {
+  color: var(--text-disabled) !important;
+  font-size: var(--text-sm) !important;
+  font-family: var(--font-body) !important;
+}

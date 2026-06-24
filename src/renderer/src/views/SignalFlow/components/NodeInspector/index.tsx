@@ -8,6 +8,7 @@ import { ws } from '@renderer/lib/ws'
 import { endpoints } from '@renderer/lib/api'
 import type { NodeCardData } from '../../nodes/NodeCard'
 import { useEscapeKey } from '@renderer/hooks/useEscapeKey'
+import { PANEL_SPRING } from '@renderer/lib/motion'
 import styles from './NodeInspector.module.css'
 
 const panelVariants = {
@@ -15,7 +16,7 @@ const panelVariants = {
   visible: { opacity: 1, y: 0 },
   exit:    { opacity: 0, y: 16 },
 }
-const panelSpring = { type: 'spring' as const, stiffness: 280, damping: 22 }
+const panelSpring = PANEL_SPRING
 
 interface Props {
   node:          Node | null

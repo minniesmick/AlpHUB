@@ -13,6 +13,24 @@
   transition: transform 0.1s var(--ease-bounce);
 }
 
+.svgWrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, rgba(255,255,255,0.14) 0%, transparent 58%);
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-out);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.svgWrap:hover::before,
+.svgWrap:focus-visible::before,
+.active::before {
+  opacity: 1;
+}
+
 .svgWrap:active {
   transform: scale(0.92);
 }
@@ -69,7 +87,7 @@
   transform: translateX(-50%);
   background: var(--surface-3);
   border: 1px solid var(--border-strong);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 2px 6px;
   font-family: var(--font-mono);
   font-size: 10px;

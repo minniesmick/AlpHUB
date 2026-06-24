@@ -10,14 +10,41 @@
   bottom: calc(var(--statusbar-height) + 6px);
   right: var(--space-4);
   width: 320px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-default);
+  background: var(--glass-surface-bg);
+  backdrop-filter: var(--glass-surface-blur);
+  -webkit-backdrop-filter: var(--glass-surface-blur);
+  border: 1px solid var(--glass-surface-border);
   border-top: var(--edge-highlight);
-  border-radius: 10px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   z-index: calc(var(--z-overlay) + 1);
   animation: slide-up 0.18s var(--ease-spring) both;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), var(--glow-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), var(--glow-primary);
+  isolation: isolate;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.045) 0%,
+    var(--glass-surface-leak) 35%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel {
+    background: var(--glass-surface-fallback);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .panel::before { display: none; }
 }
 
 .header {
@@ -40,7 +67,7 @@
 .closeBtn {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-default);
   background: transparent;
   color: var(--text-secondary);
@@ -112,7 +139,7 @@
 .progressBar {
   height: 2px;
   background: var(--surface-3);
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
@@ -120,7 +147,7 @@
   height: 100%;
   width: 100%;
   background: var(--gradient-accent-h);
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   transform-origin: left center;
   transition: transform 0.3s var(--ease-out);
 }
@@ -168,7 +195,7 @@
 .cancelBtn {
   width: 18px;
   height: 18px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--secondary-dim);
   background: var(--secondary-tint);
   color: var(--secondary);

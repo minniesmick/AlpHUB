@@ -5,6 +5,7 @@ import { endpoints } from '@renderer/lib/api'
 import type { DevicesResult } from '@renderer/lib/api'
 import { useEscapeKey } from '@renderer/hooks/useEscapeKey'
 import { DeviceSelect } from '@renderer/components/DeviceSelect'
+import { PANEL_SPRING } from '@renderer/lib/motion'
 import styles from './DeviceManager.module.css'
 
 const panelVariants = {
@@ -12,7 +13,7 @@ const panelVariants = {
   visible: { opacity: 1, scale: 1, y: 0 },
   exit:   { opacity: 0, scale: 0.95, y: -10 },
 }
-const panelSpring = { type: 'spring' as const, stiffness: 280, damping: 22 }
+const panelSpring = PANEL_SPRING
 
 const SAMPLE_RATES = ['44100', '48000', '88200', '96000']
 const BUFFER_SIZES = ['64', '128', '256', '512', '1024']

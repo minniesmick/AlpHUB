@@ -15,6 +15,16 @@ const api = {
     void ipcRenderer.invoke('show-item-in-folder', filePath)
   },
 
+  /** Open a URL in the default browser or a URI scheme (e.g. vscode://). */
+  openExternal: (url: string): void => {
+    void ipcRenderer.invoke('open-external', url)
+  },
+
+  /** Open a folder/file using the OS default handler. */
+  openPath: (filePath: string): void => {
+    void ipcRenderer.invoke('open-path', filePath)
+  },
+
   /** Fire a native Windows notification when a GPU job finishes. */
   notifyJobDone: (title: string, body: string): void => {
     void ipcRenderer.invoke('notify-job-done', title, body)

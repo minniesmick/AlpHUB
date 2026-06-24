@@ -1,0 +1,66 @@
+/* Cinematic transition overlay — positioned absolute inside .content */
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-cinematic);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Letterbox bars */
+.barTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background: #000000F2;
+  transform-origin: top center;
+}
+
+.barBottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  background: #000000F2;
+  transform-origin: bottom center;
+}
+
+/* Diagonal gradient scan sweep */
+.scanLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 38%;
+  background: linear-gradient(
+    108deg,
+    transparent 0%,
+    rgba(199, 125, 255, 0.10) 30%,
+    rgba(247,  37, 133, 0.18) 50%,
+    rgba(199, 125, 255, 0.10) 70%,
+    transparent 100%
+  );
+  filter: blur(1.5px);
+}
+
+/* Vignette pulse — brief edge darkening on cut */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barTop,
+  .barBottom,
+  .scanLine,
+  .vignette { display: none; }
+}

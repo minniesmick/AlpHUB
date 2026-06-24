@@ -33,5 +33,5 @@
   background: var(--secondary-tint);
   border: 1px solid var(--secondary-dim);
   padding: 2px 5px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }

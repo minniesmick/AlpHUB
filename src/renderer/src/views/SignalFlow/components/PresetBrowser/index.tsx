@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { X, Trash2, Save } from 'lucide-react'
 import type { Node, Edge } from '@xyflow/react'
 import { useEscapeKey } from '@renderer/hooks/useEscapeKey'
+import { PANEL_SPRING } from '@renderer/lib/motion'
 import styles from './PresetBrowser.module.css'
 
 const panelVariants = {
@@ -10,7 +11,7 @@ const panelVariants = {
   visible: { opacity: 1, x: 0 },
   exit:    { opacity: 0, x: 16 },
 }
-const panelSpring = { type: 'spring' as const, stiffness: 280, damping: 24 }
+const panelSpring = PANEL_SPRING
 
 // ── Preset definition ────────────────────────────────────────────────────────
 

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Check } from 'lucide-react'
+import { ChevronDown, Check, PackageSearch } from 'lucide-react'
 import type { Model } from '@renderer/lib/api'
+import { SkeletonLine } from '@renderer/components/Skeleton'
+import { EmptyState } from '@renderer/components/EmptyState'
 import styles from './ModelSelector.module.css'
 
 interface Props {
@@ -8,6 +10,7 @@ interface Props {
   value?: string          // model id
   tool?: Model['tool']    // filter to one tool
   placeholder?: string
+  loading?: boolean
   onChange?: (model: Model) => void
 }
 
@@ -15,7 +18,7 @@ function classNames(...cls: (string | false | undefined)[]) {
   return cls.filter(Boolean).join(' ')
 }
 
-export function ModelSelector({ models, value, tool, placeholder = 'Select model…', onChange }: Props) {
+export function ModelSelector({ models, value, tool, placeholder = 'Select model…', loading, onChange }: Props) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -41,7 +44,9 @@ export function ModelSelector({ models, value, tool, placeholder = 'Select model
         aria-haspopup="listbox"
       >
         <span className={classNames(styles.triggerText, selected && styles.hasValue)}>
-          {selected?.name ?? placeholder}
+          {loading
+            ? <SkeletonLine width="110px" height="12px" />
+            : (selected?.name ?? placeholder)}
         </span>
         <ChevronDown className={classNames(styles.chevron, open && styles.open)} size={14} />
       </button>
@@ -49,7 +54,11 @@ export function ModelSelector({ models, value, tool, placeholder = 'Select model
       {open && (
         <div className={styles.dropdown} role="listbox">
           {filtered.length === 0 ? (
-            <div className={styles.empty}>No models found</div>
+            <EmptyState
+              icon={<PackageSearch size={16} />}
+              title="No models found"
+              className={styles.emptyState}
+            />
           ) : (
             filtered.map(m => (
               <button

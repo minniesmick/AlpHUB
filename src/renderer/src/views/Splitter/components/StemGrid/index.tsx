@@ -7,18 +7,44 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useTransform, useMotionTemplate } from 'motion/react'
+import type { PanInfo } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
-import { Play, Pause } from 'lucide-react'
+import { Play, Pause, AudioLines } from 'lucide-react'
+import { toast } from 'sonner'
 import { useFileTransfer } from '@renderer/context/FileTransfer'
+import { endpoints } from '@renderer/lib/api'
+import { CARD_SPRING } from '@renderer/lib/motion'
+import { useTilt } from '@renderer/hooks/useTilt'
+import { useSpotlight } from '@renderer/hooks/useSpotlight'
+import { EmptyState } from '@renderer/components/EmptyState'
+import { ShineBorder } from '@/components/ui/shine-border'
+import { BorderBeam } from '@/components/ui/border-beam'
 import styles from './StemGrid.module.css'
+
+const STEM_DRAG_EVENT = 'stem-drag-over'
+
+function dispatchStemDrag(route: string | null) {
+  window.dispatchEvent(new CustomEvent(STEM_DRAG_EVENT, { detail: { route } }))
+}
+
+function findNavRouteAtPoint(x: number, y: number): string | null {
+  const items = document.querySelectorAll<HTMLElement>('[data-nav-route]')
+  for (const el of items) {
+    const r = el.getBoundingClientRect()
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+      return el.getAttribute('data-nav-route')
+    }
+  }
+  return null
+}
 
 const cardVariants = {
   hidden:  { opacity: 0, y: 14, scale: 0.96 },
   visible: { opacity: 1, y: 0,  scale: 1    },
-  exit:    { opacity: 0, y: 8,  scale: 0.97 },
+  exit:    { opacity: 0, y: 8,  scale: 0.97, transition: { duration: 0.18, ease: [0.4, 0, 1, 1] } },
 }
-const cardSpring = { type: 'spring' as const, stiffness: 320, damping: 24 }
+const cardSpring = CARD_SPRING
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -124,18 +150,45 @@ function relTime(ts: number): string {
 // ── StemCard (single) ─────────────────────────────────────────────────────────
 
 interface StemCardProps {
-  file:     StemFile
-  fromTool: string
-  index:    number
+  file:           StemFile
+  fromTool:       string
+  index:          number
+  isSelected:     boolean
+  anySelected:    boolean
+  onToggleSelect: () => void
 }
 
-function StemCard({ file, fromTool, index }: StemCardProps): JSX.Element {
+function StemCard({ file, fromTool, index, isSelected, anySelected, onToggleSelect }: StemCardProps): JSX.Element {
   const navigate       = useNavigate()
   const { setPending } = useFileTransfer()
   const audioRef       = useRef<HTMLAudioElement>(null)
   const [playing, setPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
   const [audioError, setAudioError] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const tilt = useTilt({ maxAngle: 8 })
+  const spot = useSpotlight()
+  const filterStyle       = useTransform(tilt.brightness, b => `brightness(${b})`)
+  const spotOpacityScaled = useTransform(spot.spotOpacity, o => o * 0.06)
+  const spotBg            = useMotionTemplate`radial-gradient(280px circle at ${spot.spotX}px ${spot.spotY}px, rgba(199, 125, 255, ${spotOpacityScaled}), transparent 80%)`
+  const handleMouseMove   = (e: React.MouseEvent<HTMLElement>): void => { if (isDragging) return; tilt.onMouseMove(e); spot.onMouseMove(e) }
+  const handleMouseLeave  = (): void => { tilt.onMouseLeave(); spot.onMouseLeave() }
+
+  const handleDrag = useCallback((_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const route = findNavRouteAtPoint(info.point.x, info.point.y)
+    dispatchStemDrag(route)
+  }, [])
+
+  const handleDragEnd = useCallback((_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setIsDragging(false)
+    dispatchStemDrag(null)
+    const route = findNavRouteAtPoint(info.point.x, info.point.y)
+    if (route) {
+      setPending({ path: file.path, filename: file.filename, fromTool })
+      navigate(route)
+    }
+  }, [file, fromTool, navigate, setPending])
 
   // Stop audio when card unmounts (e.g. navigating away)
   useEffect(() => {
@@ -199,11 +252,30 @@ function StemCard({ file, fromTool, index }: StemCardProps): JSX.Element {
 
   return (
     <motion.div
-      className={`${styles.card}${playing ? ` ${styles.cardPlaying}` : ''}`}
-      style={{ '--stem-color': color, '--stem-dim': dim, '--stem-tint': tint } as React.CSSProperties}
+      className={`${styles.card}${playing ? ` ${styles.cardPlaying}` : ''}${isDragging ? ` ${styles.cardDragging}` : ''}${isSelected ? ` ${styles.cardSelected}` : ''}${anySelected ? ` ${styles.cardSelectable}` : ''}`}
+      style={{
+        ...({ '--stem-color': color, '--stem-dim': dim, '--stem-tint': tint } as React.CSSProperties),
+        rotateX: tilt.rotateX,
+        rotateY: tilt.rotateY,
+        filter: filterStyle,
+        backgroundImage: spotBg,
+        transformPerspective: 800,
+      }}
       variants={cardVariants}
-      transition={{ ...cardSpring, delay: Math.min(index, 10) * 0.055 }}
+      layout
+      transition={{ ...cardSpring, delay: Math.min(index, 6) * 0.035 }}
+      drag
+      dragSnapToOrigin
+      dragElastic={0.12}
+      whileDrag={{ scale: 1.05, zIndex: 50, cursor: 'grabbing' }}
+      onDragStart={() => setIsDragging(true)}
+      onDrag={handleDrag}
+      onDragEnd={handleDragEnd}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
+      <ShineBorder borderWidth={1} duration={7} shineColor={['#C77DFF', '#F72585']} />
+      <BorderBeam size={60} duration={9} colorFrom="#C77DFF" colorTo="#F72585" />
       {/* Hidden audio element */}
       <audio
         ref={audioRef}
@@ -318,14 +390,68 @@ function StemCard({ file, fromTool, index }: StemCardProps): JSX.Element {
           → DAW
         </button>
       </div>
+
+      {/* Select for merge */}
+      <button
+        className={`${styles.selectBtn}${isSelected ? ` ${styles.selectBtnActive}` : ''}`}
+        onClick={e => { e.stopPropagation(); onToggleSelect() }}
+        onPointerDown={e => e.stopPropagation()}
+        aria-label={isSelected ? `Deselect ${label}` : `Select ${label} for merge`}
+        aria-pressed={isSelected}
+        title={isSelected ? 'Deselect' : 'Select for merge'}
+      >
+        {isSelected ? '✓' : '+'}
+      </button>
     </motion.div>
   )
 }
 
 // ── StemGrid ──────────────────────────────────────────────────────────────────
 
-export function StemGrid({ files, fromTool, onClear }: Props): JSX.Element | null {
-  if (files.length === 0) return null
+export function StemGrid({ files, fromTool, onClear }: Props): JSX.Element {
+  const [selected,  setSelected]  = useState<Set<string>>(new Set())
+  const [mergeName, setMergeName] = useState('merged')
+  const [merging,   setMerging]   = useState(false)
+
+  const toggleSelect = useCallback((path: string) => {
+    setSelected(prev => {
+      const s = new Set(prev)
+      if (s.has(path)) s.delete(path)
+      else s.add(path)
+      return s
+    })
+  }, [])
+
+  const handleMerge = useCallback(async () => {
+    const paths = files.filter(f => selected.has(f.path)).map(f => f.path)
+    if (paths.length < 2) return
+    setMerging(true)
+    try {
+      const outFolder = paths[0].replace(/[/\\][^/\\]+$/, '') || '.'
+      const result = await endpoints.splitterMerge({
+        input_paths:   paths,
+        output_folder: outFolder,
+        output_name:   mergeName.trim() || 'merged',
+        format:        'wav',
+      })
+      toast.success(`Merged → ${result.filename}`)
+      setSelected(new Set())
+    } catch {
+      toast.error('Merge failed')
+    } finally {
+      setMerging(false)
+    }
+  }, [files, selected, mergeName])
+
+  if (files.length === 0) {
+    return (
+      <EmptyState
+        icon={<AudioLines size={20} />}
+        title="No stems yet"
+        description="Separate a track to see stems here"
+      />
+    )
+  }
 
   return (
     <div className={styles.root}>
@@ -338,13 +464,55 @@ export function StemGrid({ files, fromTool, onClear }: Props): JSX.Element | nul
           </button>
         )}
       </div>
-      <div className={styles.grid}>
+
+      {selected.size >= 1 && (
+        <div className={styles.mergeBar}>
+          <span className={styles.mergeInfo}>
+            {selected.size} stem{selected.size !== 1 ? 's' : ''} selected
+          </span>
+          <input
+            className={styles.mergeName}
+            type="text"
+            value={mergeName}
+            onChange={e => setMergeName(e.target.value)}
+            placeholder="output name…"
+            aria-label="Merged output file name"
+            maxLength={60}
+          />
+          <button
+            className={styles.mergeBtn}
+            onClick={handleMerge}
+            disabled={merging || selected.size < 2}
+            aria-label="Merge selected stems"
+          >
+            {merging ? 'Merging…' : 'Merge'}
+          </button>
+          <button
+            className={styles.mergeClearBtn}
+            onClick={() => setSelected(new Set())}
+            aria-label="Clear selection"
+            title="Clear selection"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <motion.div className={styles.grid} layout>
         <AnimatePresence initial={false}>
           {files.map((f, i) => (
-            <StemCard key={f.path} file={f} fromTool={fromTool} index={i} />
+            <StemCard
+              key={f.path}
+              file={f}
+              fromTool={fromTool}
+              index={i}
+              isSelected={selected.has(f.path)}
+              anySelected={selected.size > 0}
+              onToggleSelect={() => toggleSelect(f.path)}
+            />
           ))}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </div>
   )
 }

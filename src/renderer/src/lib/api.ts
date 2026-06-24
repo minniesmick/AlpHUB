@@ -65,6 +65,42 @@ export interface SystemInfo {
   vram_free_gb:      number | null
 }
 
+export interface SystemMetrics {
+  cpu_pct:          number
+  ram_pct:          number
+  ram_used_gb:      number
+  ram_total_gb:     number
+  net_recv_mb:      number
+  net_sent_mb:      number
+  disk_pct:         number
+  disk_used_gb:     number
+  disk_total_gb:    number
+  gpu_pct:          number | null
+  gpu_mem_used_gb:  number | null
+  gpu_mem_total_gb: number | null
+  gpu_temp:         number | null
+  gpu_name:         string | null
+}
+
+export interface Project {
+  name:        string
+  path:        string
+  branch:      string
+  lang:        string
+  last_commit: { hash: string; msg: string; date: string } | null
+  modified_at: number
+}
+
+export interface ImageGenApp {
+  id:          string
+  name:        string
+  port:        number | null
+  online:      boolean
+  type:        'local' | 'web'
+  launch_path: string | null
+  url:         string | null
+}
+
 export const endpoints = {
   health:      ()                                    => api.get<{ status: string }>('/health'),
   systemInfo:  ()                                    => api.get<SystemInfo>('/api/system'),
@@ -79,6 +115,8 @@ export const endpoints = {
     api.put<{ ok: boolean }>(`/api/daw/param?node_id=${encodeURIComponent(node_id)}&param=${encodeURIComponent(param)}&value=${value}`),
   splitterRun:      (payload: unknown)                    => api.post<{ job_id: string }>('/api/splitter/run', payload),
   splitterCancel:   (job_id: string)                      => api.delete<{ ok: boolean; job_id: string }>(`/api/splitter/jobs/${job_id}`),
+  splitterMerge:    (payload: { input_paths: string[]; output_folder: string; output_name?: string; format?: string }) =>
+    api.post<{ path: string; filename: string }>('/api/splitter/merge', payload),
   pipelineRun:      (payload: unknown)                    => api.post<{ job_id: string }>('/api/pipeline/run', payload),
   pipelineCancel:   (job_id: string)                      => api.delete<{ ok: boolean; job_id: string }>(`/api/pipeline/jobs/${job_id}`),
   pipelineProfiles: (payload: { reference_path: string; profile_name: string }) =>
@@ -88,4 +126,9 @@ export const endpoints = {
   ollamaStatus:     ()                                    => api.get<{ running: boolean }>('/api/ollama/status'),
   ollamaModels:     ()                                    => api.get<{ models: { id: string; name: string; size_gb: number }[] }>('/api/ollama/models'),
   readFile:         (path: string)                        => api.get<{ content: string; filename: string }>(`/api/file?path=${encodeURIComponent(path)}`),
+  systemMetrics:    ()                                    => api.get<SystemMetrics>('/api/system/metrics'),
+  listProjects:     (root?: string)                       => api.get<{ projects: Project[] }>(`/api/projects${root ? `?root=${encodeURIComponent(root)}` : ''}`),
+  imagegenStatus:   ()                                    => api.get<{ apps: ImageGenApp[] }>('/api/imagegen/status'),
+  imagegenOpen:     (port: number)                        => api.post<{ ok: boolean }>(`/api/imagegen/open?port=${port}`),
+  imagegenLaunch:   (app_id: string)                      => api.post<{ ok: boolean }>(`/api/imagegen/launch/${app_id}`),
 }

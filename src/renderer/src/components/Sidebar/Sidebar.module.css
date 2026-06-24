@@ -5,19 +5,23 @@
   width: var(--sidebar-width);
   padding: var(--space-2) 0;
   position: relative;
+  flex-shrink: 0;
 }
 
-/* Ambient bloom — always-on purple radial cast */
-.sidebar::after {
-  content: '';
+/* Reactive bloom — motion div tracks active nav item */
+.bloom {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
+  left: 0;
+  right: 0;
+  height: 120px;
+  margin-top: -60px; /* center the div on the target Y */
   background: radial-gradient(
-    ellipse 80% 160px at 50% 25%,
-    color-mix(in srgb, var(--primary) 10%, transparent),
+    ellipse 100% 100% at 50% 50%,
+    color-mix(in srgb, var(--primary) 14%, transparent),
     transparent 80%
   );
+  pointer-events: none;
+  z-index: 0;
 }
 
 .toolList,
@@ -27,6 +31,8 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
+  position: relative;
+  z-index: 1;
 }
 
 .toolList {
@@ -54,6 +60,68 @@
 .navItem:hover {
   color: var(--text-primary);
   background: var(--surface-2);
+}
+
+/* ── Drag-over drop target ───────────────────────────────────────────────── */
+
+.navItemDropTarget {
+  color: var(--primary) !important;
+  background: var(--primary-active) !important;
+  box-shadow: var(--glow-primary-sm), inset 0 0 0 1px var(--primary-glow);
+  animation: drop-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes drop-pulse {
+  0%, 100% { background: var(--primary-active) !important; }
+  50%       { background: var(--primary-tint) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navItemDropTarget { animation: none; }
+}
+
+.dropIndicator {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: var(--glow-primary-sm);
+  pointer-events: none;
+}
+
+/* ── Expanded nav item ───────────────────────────────────────────────────── */
+
+.navItemExpanded {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0 var(--space-3);
+  gap: var(--space-2);
+}
+
+.navLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* When sidebar is expanded, stretch list items */
+.sidebar[data-expanded="true"] .toolList,
+.sidebar[data-expanded="true"] .bottomList {
+  align-items: stretch;
+  padding: 0 var(--space-2);
+}
+
+.navItem:active {
+  transform: scale(0.90);
+  transition: transform 80ms var(--ease-in);
 }
 
 .navItem.active {
@@ -104,4 +172,36 @@
 
 @media (prefers-reduced-motion: reduce) {
   .streamDot { animation: none; }
+}
+
+/* ── Scramble tooltip ────────────────────────────────────────────────────── */
+
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--glass-l3-bg);
+  backdrop-filter: var(--glass-l3-blur);
+  -webkit-backdrop-filter: var(--glass-l3-blur);
+  border: 1px solid var(--glass-l3-border);
+  border-radius: var(--radius-md);
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-family: var(--font-mono-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  pointer-events: none;
+  z-index: var(--z-tooltip);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.tooltipShortcut {
+  font-size: 10px;
+  color: var(--text-disabled);
+  font-weight: 500;
 }

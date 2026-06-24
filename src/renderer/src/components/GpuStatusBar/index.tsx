@@ -1,11 +1,19 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { motion, useSpring, useTransform } from 'motion/react'
 import { Cpu } from 'lucide-react'
 import { ws } from '../../lib/ws'
+import { BAR_SPRING } from '../../lib/motion'
 import type { JobProgressEvent, JobCompleteEvent, JobErrorEvent, JobQueuedEvent, JobCancelledEvent } from '../../lib/ws'
 import { endpoints } from '../../lib/api'
 import { JobQueueOverlay } from '../JobQueueOverlay'
 import type { QueuedJob } from '../JobQueueOverlay'
 import styles from './GpuStatusBar.module.css'
+
+function SpringPct({ value }: { value: number }): JSX.Element {
+  const spring = useSpring(value, BAR_SPRING)
+  useEffect(() => { spring.set(value) }, [value, spring])
+  return <motion.span>{useTransform(spring, v => `${Math.round(v)}%`)}</motion.span>
+}
 
 // Helper: remove job_id from list and promote next queued job to running
 function removeJob(prev: QueuedJob[], job_id: string): QueuedJob[] {
@@ -97,7 +105,7 @@ export default function GpuStatusBar(): JSX.Element {
               <div className={styles.progressTrack}>
                 <div className={styles.progressFill} style={{ transform: `scaleX(${activeJob.progress / 100})` }} />
               </div>
-              <span className={styles.pct}>{activeJob.progress}%</span>
+              <span className={styles.pct}><SpringPct value={activeJob.progress} /></span>
               {activeJob.eta != null && activeJob.eta > 0 && (
                 <span className={styles.eta}>
                   ~{Math.floor(activeJob.eta / 60)}:{String(Math.round(activeJob.eta % 60)).padStart(2, '0')}

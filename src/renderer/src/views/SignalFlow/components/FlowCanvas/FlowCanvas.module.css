@@ -54,7 +54,28 @@
   .canvas::before { animation: none; opacity: 0.75; }
 }
 
+/* ── Animated grid pattern (replaces static ::after grid) ─────────────────────── */
+
+.gridPattern {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  fill: rgba(199, 125, 255, 0.35);
+  stroke: rgba(199, 125, 255, 0.07);
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────── */
+
+.emptyOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
 
 .scanlines {
   position: absolute;

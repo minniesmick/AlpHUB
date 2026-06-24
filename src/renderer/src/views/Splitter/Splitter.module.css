@@ -9,7 +9,20 @@
       color-mix(in srgb, var(--secondary) 5%, transparent),
       transparent),
     var(--void);
-  animation: fade-in 0.15s var(--ease-out) both;
+}
+
+.ambientOrb {
+  position: absolute;
+  width: 60%;
+  height: 50%;
+  bottom: 0;
+  left: -5%;
+  border-radius: 50%;
+  background-color: #F5A623;
+  filter: blur(110px);
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .toolbar {
@@ -68,7 +81,7 @@
 .modelCard {
   flex: 1;
   padding: var(--space-3) var(--space-4);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: 1.5px solid var(--border-default);
   background: var(--surface-2);
   cursor: pointer;
@@ -110,7 +123,7 @@
 .stemChip {
   height: 32px;
   padding: 0 var(--space-3);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: 1.5px solid var(--border-default);
   background: var(--surface-2);
   color: var(--text-secondary);
@@ -160,7 +173,7 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
   background: var(--surface-2);
   font-size: 10px;
@@ -174,6 +187,8 @@
 /* Divider */
 .divider { height: 1px; background: var(--border-subtle); }
 
+.marquee { margin-bottom: var(--space-2); }
+
 /* Run */
 .runRow {
   display: flex;
@@ -185,7 +200,7 @@
 .cancelBtn {
   height: 40px;
   padding: 0 var(--space-4);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--secondary-dim);
   background: var(--secondary-tint);
   color: var(--secondary);
@@ -201,7 +216,7 @@
 .runBtn {
   height: 40px;
   padding: 0 var(--space-6);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   border: none;
   background: var(--gradient-accent-h);
   color: white;
@@ -209,13 +224,40 @@
   font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--glow-primary);
-  transition: opacity 0.1s, box-shadow 0.15s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: opacity 0.1s, box-shadow 0.15s;
 }
 
-.runBtn:hover { opacity: 0.9; box-shadow: var(--glow-primary-md); transform: translateY(-1px); }
-.runBtn:active { transform: translateY(0); }
-.runBtn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.runBtn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.10);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out);
+  pointer-events: none;
+}
+
+.runBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.20) 50%, transparent 65%);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  transition: background-position 0.55s var(--ease-smooth);
+  pointer-events: none;
+}
+
+.runBtn:hover { opacity: 0.95; box-shadow: var(--glow-primary-md), inset 0 1px 0 rgba(255, 255, 255, 0.22); }
+.runBtn:hover::before { transform: scaleX(1); }
+.runBtn:hover::after  { background-position: 200% 0; }
+.runBtn:active { opacity: 0.85; box-shadow: var(--glow-primary), inset 0 2px 6px rgba(0, 0, 0, 0.4); }
+.runBtn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+.runBtn.loading::after { animation: shimmer 1.5s linear infinite; }
 
 /* Output path hint */
 .outputHint {

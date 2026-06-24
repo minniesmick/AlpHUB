@@ -4,7 +4,6 @@
   grid-template-rows: 1fr var(--statusbar-height);
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   background: var(--void);
 }
 
@@ -14,6 +13,7 @@
   z-index: var(--z-sidebar);
   border-right: 1px solid var(--border-subtle);
   background: var(--surface-1);
+  overflow: visible;   /* allow sidebar to expand over content */
 }
 
 .content {
@@ -28,4 +28,12 @@
   grid-column: 2;
   grid-row: 2;
   z-index: var(--z-statusbar);
+}
+
+.particlesLayer {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  position: relative;
+  z-index: 0;
+  pointer-events: none;
 }

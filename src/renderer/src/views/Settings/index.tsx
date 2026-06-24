@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+import { ChevronDown } from 'lucide-react'
 import { endpoints } from '@renderer/lib/api'
 import type { VoiceProfile, SystemInfo } from '@renderer/lib/api'
 import { useSettings } from '@renderer/context/Settings'
 import { useToast } from '@renderer/context/Toast'
 import { ConfirmDialog } from '@renderer/components/ConfirmDialog'
+import { NAV_SPRING } from '@renderer/lib/motion'
 import styles from './Settings.module.css'
 import { PageTransition } from '@renderer/components/PageTransition'
 
@@ -14,6 +17,56 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'paths',    label: 'Paths' },
   { id: 'profiles', label: 'Profiles' },
 ]
+
+const ACCORD_TRANS = { duration: 0.22, ease: [0, 0, 0.2, 1] as [number, number, number, number] }
+
+// ── AccordionSection ──────────────────────────────────────────────────────────
+
+function AccordionSection({
+  title,
+  children,
+  defaultOpen = true,
+}: {
+  title:        string
+  children:     React.ReactNode
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  return (
+    <div className={styles.accordionSection}>
+      <button
+        className={styles.accordionHeader}
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+      >
+        {title}
+        <motion.span
+          className={styles.accordionChevron}
+          animate={{ rotate: open ? 0 : -90 }}
+          transition={{ duration: 0.18 }}
+        >
+          <ChevronDown size={14} strokeWidth={2} />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            className={styles.accordionBody}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={ACCORD_TRANS}
+          >
+            <div className={styles.accordionContent}>
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 // ── PathField ────────────────────────────────────────────────────────────────
 
@@ -62,46 +115,49 @@ function AudioPanel() {
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>ASIO Device</div>
-      <div className={styles.hint}>
-        ASIO device selection is available in Signal Flow → Transport Bar.
-        Configure buffer size and sample rate there before starting a session.
-      </div>
+      <AccordionSection title="ASIO Device">
+        <div className={styles.hint}>
+          ASIO device selection is available in Signal Flow → Transport Bar.
+          Configure buffer size and sample rate there before starting a session.
+        </div>
+      </AccordionSection>
 
-      <div className={styles.sectionTitle} style={{ marginTop: 'var(--space-4)' }}>System</div>
-      <div className={styles.sysGrid}>
-        <span className={styles.sysKey}>Python</span>
-        <span className={styles.sysVal}>{sysInfo?.python_version ?? '—'}</span>
+      <AccordionSection title="System Info" defaultOpen={false}>
+        <div className={styles.sysGrid}>
+          <span className={styles.sysKey}>Python</span>
+          <span className={styles.sysVal}>{sysInfo?.python_version ?? '—'}</span>
 
-        <span className={styles.sysKey}>CUDA</span>
-        <span className={`${styles.sysVal} ${sysInfo?.cuda_available ? styles.sysValOn : styles.sysValOff}`}>
-          {sysInfo == null ? '—' : sysInfo.cuda_available ? 'Available' : 'Not available'}
-        </span>
+          <span className={styles.sysKey}>CUDA</span>
+          <span className={`${styles.sysVal} ${sysInfo?.cuda_available ? styles.sysValOn : styles.sysValOff}`}>
+            {sysInfo == null ? '—' : sysInfo.cuda_available ? 'Available' : 'Not available'}
+          </span>
 
-        {sysInfo?.cuda_device_name && (
-          <>
-            <span className={styles.sysKey}>GPU</span>
-            <span className={styles.sysVal}>{sysInfo.cuda_device_name}</span>
-          </>
-        )}
+          {sysInfo?.cuda_device_name && (
+            <>
+              <span className={styles.sysKey}>GPU</span>
+              <span className={styles.sysVal}>{sysInfo.cuda_device_name}</span>
+            </>
+          )}
 
-        {sysInfo?.vram_total_gb != null && (
-          <>
-            <span className={styles.sysKey}>VRAM</span>
-            <span className={styles.sysVal}>
-              {sysInfo.vram_free_gb} GB free / {sysInfo.vram_total_gb} GB
-            </span>
-          </>
-        )}
-      </div>
+          {sysInfo?.vram_total_gb != null && (
+            <>
+              <span className={styles.sysKey}>VRAM</span>
+              <span className={styles.sysVal}>
+                {sysInfo.vram_free_gb} GB free / {sysInfo.vram_total_gb} GB
+              </span>
+            </>
+          )}
+        </div>
+      </AccordionSection>
 
-      <div className={styles.sectionTitle} style={{ marginTop: 'var(--space-4)' }}>Python Venv</div>
-      <PathField
-        label="Hub venv path"
-        value="D:\\AI_Ortak_Venv\\hub_venv"
-        onChange={() => {}}
-      />
-      <div className={styles.hint}>Hardcoded NTFS junction. Change requires backend restart.</div>
+      <AccordionSection title="Python Venv" defaultOpen={false}>
+        <PathField
+          label="Hub venv path"
+          value="D:\\AI_Ortak_Venv\\hub_venv"
+          onChange={() => {}}
+        />
+        <div className={styles.hint}>Hardcoded NTFS junction. Change requires backend restart.</div>
+      </AccordionSection>
     </div>
   )
 }
@@ -142,45 +198,49 @@ function PathsPanel() {
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>Model Directories</div>
-      <PathField
-        label="Models root"
-        value={settings.modelsPath}
-        onChange={v => set('modelsPath', v)}
-        onRescan={rescan}
-        rescanning={rescanning}
-      />
-      <div className={styles.hint}>
-        Subdirs: whisper/ · demucs/ · rvc/ · kokoro/
-      </div>
+      <AccordionSection title="Model Paths">
+        <PathField
+          label="Models root"
+          value={settings.modelsPath}
+          onChange={v => set('modelsPath', v)}
+          onRescan={rescan}
+          rescanning={rescanning}
+        />
+        <div className={styles.hint}>
+          Subdirs: whisper/ · demucs/ · rvc/ · kokoro/
+        </div>
+      </AccordionSection>
 
-      <div className={styles.sectionTitle} style={{ marginTop: 'var(--space-4)' }}>Output</div>
-      <PathField
-        label="Default output path"
-        value={settings.outputPath}
-        onChange={v => set('outputPath', v)}
-      />
-      <div className={styles.hint}>Pipeline and Splitter write files here.</div>
+      <AccordionSection title="Output">
+        <PathField
+          label="Default output path"
+          value={settings.outputPath}
+          onChange={v => set('outputPath', v)}
+        />
+        <div className={styles.hint}>Pipeline and Splitter write files here.</div>
+      </AccordionSection>
 
-      <div className={styles.sectionTitle} style={{ marginTop: 'var(--space-4)' }}>Profiles</div>
-      <PathField
-        label="Profiles root"
-        value={settings.profilesPath}
-        onChange={v => set('profilesPath', v)}
-      />
-      <div className={styles.hint}>Each profile: {"<name>/meta.json + embedding.npy"}</div>
+      <AccordionSection title="Profiles" defaultOpen={false}>
+        <PathField
+          label="Profiles root"
+          value={settings.profilesPath}
+          onChange={v => set('profilesPath', v)}
+        />
+        <div className={styles.hint}>Each profile: {"<name>/meta.json + embedding.npy"}</div>
+      </AccordionSection>
 
-      <div className={styles.sectionTitle} style={{ marginTop: 'var(--space-4)' }}>Data</div>
-      <div className={styles.hint}>
-        Output histories, custom presets, graph, stream config, preferences.
-      </div>
-      <button
-        className={styles.clearDataBtn}
-        onClick={() => setClearConfirm(true)}
-        aria-label="Clear all app data"
-      >
-        Clear all data…
-      </button>
+      <AccordionSection title="Data" defaultOpen={false}>
+        <div className={styles.hint}>
+          Output histories, custom presets, graph, stream config, preferences.
+        </div>
+        <button
+          className={styles.clearDataBtn}
+          onClick={() => setClearConfirm(true)}
+          aria-label="Clear all app data"
+        >
+          Clear all data…
+        </button>
+      </AccordionSection>
 
       <ConfirmDialog
         open={clearConfirm}
@@ -229,45 +289,44 @@ function ProfilesPanel() {
 
   return (
     <div className={styles.section}>
-      <div className={styles.sectionTitle}>Voice Profiles</div>
-
-      {loading ? (
-        <p className={styles.hint}>Loading…</p>
-      ) : profiles.length === 0 ? (
-        <div className={styles.emptyProfiles}>
-          <p className={styles.emptyProfilesText}>No profiles yet</p>
-          <p className={styles.hint}>
-            Create one in Pipeline → STS mode → New Profile.
-          </p>
+      <AccordionSection title="Voice Profiles">
+        {loading ? (
+          <p className={styles.hint}>Loading…</p>
+        ) : profiles.length === 0 ? (
+          <div className={styles.emptyProfiles}>
+            <p className={styles.emptyProfilesText}>No profiles yet</p>
+            <p className={styles.hint}>
+              Create one in Pipeline → STS mode → New Profile.
+            </p>
+          </div>
+        ) : (
+          <ul className={styles.profileList}>
+            {profiles.map(p => (
+              <li key={p.id} className={styles.profileCard}>
+                <div className={styles.profileInfo}>
+                  <span className={styles.profileName}>{p.name ?? p.id}</span>
+                  {p.created && (
+                    <span className={styles.profileMeta}>
+                      {new Date(p.created).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+                <button
+                  className={styles.profileDeleteBtn}
+                  onClick={() => setPending(p)}
+                  disabled={deleting === p.id}
+                  aria-label={`Delete profile ${p.name ?? p.id}`}
+                >
+                  {deleting === p.id ? '…' : '×'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className={styles.hint}>
+          Profiles stored at: Paths → Profiles root
         </div>
-      ) : (
-        <ul className={styles.profileList}>
-          {profiles.map(p => (
-            <li key={p.id} className={styles.profileCard}>
-              <div className={styles.profileInfo}>
-                <span className={styles.profileName}>{p.name ?? p.id}</span>
-                {p.created && (
-                  <span className={styles.profileMeta}>
-                    {new Date(p.created).toLocaleDateString()}
-                  </span>
-                )}
-              </div>
-              <button
-                className={styles.profileDeleteBtn}
-                onClick={() => setPending(p)}
-                disabled={deleting === p.id}
-                aria-label={`Delete profile ${p.name ?? p.id}`}
-              >
-                {deleting === p.id ? '…' : '×'}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className={styles.hint}>
-        Profiles stored at: Paths → Profiles root
-      </div>
+      </AccordionSection>
 
       <ConfirmDialog
         open={!!pendingDelete}
@@ -297,6 +356,13 @@ export default function SettingsView(): JSX.Element {
             onClick={() => setTab(t.id)}
             aria-current={tab === t.id ? 'page' : undefined}
           >
+            {tab === t.id && (
+              <motion.div
+                layoutId="settings-tab-indicator"
+                className={styles.tabIndicator}
+                transition={NAV_SPRING}
+              />
+            )}
             {t.label}
           </button>
         ))}

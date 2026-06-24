@@ -1,26 +1,138 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
 @plugin "tailwindcss-animate";
 
 @theme {
-  /* Map AlpHUB tokens into Tailwind theme */
+  /* ── Surfaces ─────────────────────────────────────────────────────────── */
   --color-void:        #09090F;
   --color-surface-1:   #111119;
   --color-surface-2:   #171724;
   --color-surface-3:   #1E1E2E;
   --color-surface-4:   #252535;
 
-  --color-primary:     #C77DFF;
-  --color-primary-dim: #C77DFF99;
-  --color-secondary:   #F72585;
-  --color-secondary-dim: #F7258599;
+  /* ── Accent ───────────────────────────────────────────────────────────── */
+  --color-primary:             #C77DFF;
+  --color-primary-dim:         #C77DFF99;
+  --color-primary-tint:        #C77DFF18;
+  --color-primary-active:      #C77DFF28;
+  --color-primary-glow:        #C77DFF33;
+  --color-primary-foreground:  #FFFFFF;
 
+  --color-secondary:            #F72585;
+  --color-secondary-dim:        #F7258599;
+  --color-secondary-tint:       #F7258514;
+  --color-secondary-foreground: #FFFFFF;
+
+  /* ── Status ───────────────────────────────────────────────────────────── */
+  --color-success:     #39D98A;
+  --color-warning:     #F5A623;
+  --color-error:       #F72585;
+  --color-info:        #60B4FF;
+
+  /* ── Text ─────────────────────────────────────────────────────────────── */
   --color-text-primary:   #F0EFF8;
   --color-text-secondary: #8A87A8;
   --color-text-disabled:  #4A4760;
 
+  /* ── Borders ──────────────────────────────────────────────────────────── */
+  --color-border:         #2C2C3E;
+  --color-border-subtle:  #1E1E2E;
   --color-border-default: #2C2C3E;
   --color-border-strong:  #3E3E52;
 
-  --font-body: 'Inter Variable', sans-serif;
-  --font-mono: 'JetBrains Mono Variable', monospace;
+  /* shadcn-compatible semantic aliases */
+  --color-background:          #09090F;
+  --color-foreground:          #F0EFF8;
+  --color-card:                #171724;
+  --color-card-foreground:     #F0EFF8;
+  --color-popover:             #1E1E2E;
+  --color-popover-foreground:  #F0EFF8;
+  --color-muted:               #1E1E2E;
+  --color-muted-foreground:    #8A87A8;
+  --color-accent:              #252535;
+  --color-accent-foreground:   #F0EFF8;
+  --color-destructive:         #F72585;
+  --color-destructive-foreground: #FFFFFF;
+  --color-input:               #2C2C3E;
+  --color-ring:                #C77DFF;
+
+  /* ── Radius ───────────────────────────────────────────────────────────── */
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   12px;
+  --radius-2xl:  20px;
+  --radius-pill: 9999px;
+
+  /* ── Typography ───────────────────────────────────────────────────────── */
+  --font-display: 'Satoshi', 'Geist', 'Inter Variable', system-ui, sans-serif;
+  --font-body:    'Geist', 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', monospace;
+  --font-mono-ui: 'Geist Mono', 'JetBrains Mono Variable', monospace;
+
+  /* ── Z-index ──────────────────────────────────────────────────────────── */
+  --z-canvas:          0;
+  --z-node:           10;
+  --z-panel:          20;
+  --z-drawer:         30;
+  --z-sidebar:        40;
+  --z-statusbar:      50;
+  --z-overlay:        60;
+  --z-dropdown:       65;
+  --z-modal-backdrop: 68;
+  --z-modal:          70;
+  --z-tooltip:        80;
+  --z-cinematic:     200;
+}
+
+@theme inline {
+  --animate-shimmer-slide:        shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around:        spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-shine:        shine var(--duration) infinite linear;
+  --animate-meteor:        meteor 5s linear infinite;
+  @keyframes shimmer-slide {
+  to {
+    transform:        translate(calc(100cqw - 100%), 0);
+    }
+  }
+  @keyframes spin-around {
+  0% {
+    transform:        translateZ(0) rotate(0);
+    }
+  15%, 35% {
+    transform:        translateZ(0) rotate(90deg);
+    }
+  65%, 85% {
+    transform:        translateZ(0) rotate(270deg);
+    }
+  100% {
+    transform:        translateZ(0) rotate(360deg);
+    }
+  }
+  @keyframes shine {
+  0% {
+    background-position:        0% 0%;
+    }
+  50% {
+    background-position:        100% 100%;
+    }
+  to {
+    background-position:        0% 0%;
+    }
+  }
+  @keyframes meteor {
+  0% {
+    transform:        rotate(var(--angle)) translateX(0);
+    opacity:        1;
+    }
+  70% {
+    opacity:        1;
+    }
+  100% {
+    transform:        rotate(var(--angle)) translateX(-500px);
+    opacity:        0;
+    }
+  }
 }

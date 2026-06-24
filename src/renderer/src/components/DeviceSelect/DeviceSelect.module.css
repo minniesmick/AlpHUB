@@ -15,7 +15,7 @@
   max-width: 140px;
   background: var(--surface-2);
   border: 1px solid var(--border-default);
-  border-radius: 5px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -52,7 +52,7 @@
   max-width: 260px;
   background: var(--surface-3);
   border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   z-index: var(--z-dropdown);
   max-height: 220px;

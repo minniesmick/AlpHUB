@@ -1,6 +1,14 @@
 import { useReactFlow, Handle, Position, type NodeProps } from '@xyflow/react'
+import { motion } from 'motion/react'
 import { Power } from 'lucide-react'
+import { CARD_SPRING } from '@renderer/lib/motion'
 import styles from './NodeCard.module.css'
+
+function staggerDelay(id: string): number {
+  let h = 0
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) & 0xfffff
+  return (h % 8) * 0.05
+}
 
 export interface NodeCardData extends Record<string, unknown> {
   label:     string
@@ -33,13 +41,16 @@ export function NodeCard({ id, data, selected }: NodeProps) {
     : styles.typeEffect
 
   return (
-    <div
+    <motion.div
       className={classNames(
         styles.card,
         typeClass,
         selected && styles.selected,
         bypassed && styles.bypassed,
       )}
+      initial={{ opacity: 0, y: 12, scale: 0.94 }}
+      animate={{ opacity: 1, y: 0,  scale: 1    }}
+      transition={{ ...CARD_SPRING, delay: staggerDelay(id) }}
     >
       {hasInput && (
         <Handle
@@ -88,6 +99,6 @@ export function NodeCard({ id, data, selected }: NodeProps) {
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'motion/react'
-import { ChevronDown, Check, Play, X } from 'lucide-react'
+import { ChevronDown, Check, Play, X, Loader2 } from 'lucide-react'
 import { FileDropZone } from '@renderer/components/FileDropZone'
 import { ModelSelector } from '@renderer/components/ModelSelector'
 import { ProgressBar } from '@renderer/components/ProgressBar'
@@ -20,6 +20,11 @@ import { OutputFileList }         from './components/OutputFileList'
 import { ProfileCreationSheet }   from './components/ProfileCreationSheet'
 import { MicButton }              from './components/MicButton'
 import { PipelineBg }             from './components/PipelineBg'
+import { BTN_SPRING } from '@renderer/lib/motion'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
+import { useMagnetic } from '@renderer/hooks/useMagnetic'
+import { useParticleBurst } from '@renderer/hooks/useParticleBurst'
+import { ProcessingMarquee } from '@renderer/components/ProcessingMarquee'
 import styles from './Pipeline.module.css'
 import { PageTransition } from '@renderer/components/PageTransition'
 
@@ -302,6 +307,9 @@ export default function PipelineView(): JSX.Element {
   const toast = useToast()
   const { settings, set: setSetting } = useSettings()
   const { pending, setPending }   = useFileTransfer()
+  const runMagnetic = useMagnetic({ threshold: 80, strength: 0.35 })
+  const burst       = useParticleBurst()
+  const runBtnRef   = useRef<HTMLDivElement>(null)
   const [mode, setMode]           = useState<PipelineMode>(() => loadPrefs().mode)
   const [models, setModels]       = useState<Model[]>([])
   const [modelId, setModelId]     = useState<string | undefined>(undefined)
@@ -320,6 +328,7 @@ export default function PipelineView(): JSX.Element {
   const [lastAudio, setLastAudio] = useState<string | null>(null)
   const [lastText,  setLastText]  = useState<string | null>(null)
   const [profileSheetOpen, setProfileSheetOpen] = useState(false)
+  const [jobGlow, setJobGlow]                  = useState(false)
 
   // Voice preview (T2-B)
   const [previewJobId,        setPreviewJobId]        = useState<string | null>(null)
@@ -328,6 +337,7 @@ export default function PipelineView(): JSX.Element {
   // Stable refs for keyboard shortcut handler — updated inline each render
   const runRef    = useRef<() => unknown>(() => undefined)
   const cancelRef = useRef<() => unknown>(() => undefined)
+  const prevOutputsLenRef = useRef(outputs.length)
 
   // Batch STT (T2-A)
   const [batchItems, setBatchItems] = useState<BatchItem[]>([])
@@ -369,9 +379,10 @@ export default function PipelineView(): JSX.Element {
 
   // Load models on mount + refresh when a rescan completes (from Settings)
   useEffect(() => {
+    let fired = false
     endpoints.models(settings.modelsPath || undefined)
       .then(r => setModels(Object.values(r.models).flat()))
-      .catch(() => toast.error('Failed to load models — check Settings → Paths'))
+      .catch(() => { if (!fired) { fired = true; toast.error('Failed to load models — check Settings → Paths') } })
 
     return ws.on('scan_complete', d => {
       const flat = Object.values(d.models as Record<string, Model[]>).flat()
@@ -402,6 +413,16 @@ export default function PipelineView(): JSX.Element {
     const id = setInterval(check, 4000)
     return () => { cancelled = true; clearInterval(id) }
   }, [mode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (outputs.length > prevOutputsLenRef.current) {
+      setJobGlow(true)
+      const t = setTimeout(() => setJobGlow(false), 600)
+      prevOutputsLenRef.current = outputs.length
+      return () => clearTimeout(t)
+    }
+    prevOutputsLenRef.current = outputs.length
+  }, [outputs])
 
   const handleStartOllama = async (): Promise<void> => {
     setOllamaStarting(true)
@@ -452,6 +473,15 @@ export default function PipelineView(): JSX.Element {
               .then(text => setLastText(text))
               .catch(() => {})
           }
+          const doneMsg =
+            mode === 'stt' ? 'Transcription complete' :
+            mode === 'tts' ? 'Audio generated' :
+            mode === 'sts' ? 'Voice converted' :
+            mode === 'ttt' ? 'Translation complete' :
+            'Job complete'
+          toast.success(doneMsg)
+          const rect = runBtnRef.current?.getBoundingClientRect()
+          if (rect) burst(rect.left + rect.width / 2, rect.top + rect.height / 2)
           setJobId(null)
         } else {
           const bIdx = batchItemsRef.current.findIndex(b => b.job_id === d.job_id)
@@ -465,7 +495,13 @@ export default function PipelineView(): JSX.Element {
       ws.on('job_error', d => {
         if (d.job_id === jobId) {
           setJobId(null); setProgress(0)
-          toast.error(`Job failed: ${d.error}`)
+          const failLabel =
+            mode === 'stt' ? 'Transcription failed' :
+            mode === 'tts' ? 'TTS failed' :
+            mode === 'sts' ? 'Voice conversion failed' :
+            mode === 'ttt' ? 'Translation failed' :
+            'Job failed'
+          toast.error(`${failLabel} — ${d.error}`)
         } else {
           const bIdx = batchItemsRef.current.findIndex(b => b.job_id === d.job_id)
           if (bIdx !== -1) setBatchItems(prev => prev.map((b, i) => i === bIdx ? { ...b, status: 'error' } : b))
@@ -666,6 +702,14 @@ export default function PipelineView(): JSX.Element {
   const needsOllama       = mode === 'ttt'
   const isRunning = jobId !== null || batchActive
 
+  const PIPELINE_STAGES: Record<string, string[]> = {
+    stt: ['Loading model', 'Preprocessing audio', 'Transcribing', 'Formatting output'],
+    tts: ['Loading voice model', 'Synthesizing speech', 'Post-processing', 'Exporting audio'],
+    sts: ['Loading source model', 'Extracting voice', 'Converting', 'Rendering audio'],
+    ttt: ['Connecting to Ollama', 'Loading model', 'Translating', 'Writing output'],
+  }
+  const marqueeStages = PIPELINE_STAGES[mode] ?? ['Processing']
+
   const disabledReason: string = canRun ? '' :
     isRunning                          ? 'Job running — cancel first'     :
     mode === 'ttt' && !ollamaRunning   ? 'Start Ollama first'             :
@@ -701,6 +745,7 @@ export default function PipelineView(): JSX.Element {
     <PageTransition>
       <div className={styles.view}>
       <PipelineBg />
+      <div className={styles.ambientOrb} />
 
       <div className={styles.toolbar}>
         <span className={styles.toolbarTitle}>Pipeline</span>
@@ -976,6 +1021,7 @@ export default function PipelineView(): JSX.Element {
         {isRunning && (
           <div className={styles.progressWrap}>
             <ProgressBar value={progress} label="Processing…" eta={eta} animated />
+            <ProcessingMarquee stages={marqueeStages} className={styles.marquee} />
           </div>
         )}
 
@@ -985,16 +1031,28 @@ export default function PipelineView(): JSX.Element {
               Cancel
             </button>
           )}
-          <motion.button
-            className={styles.runBtn}
-            onClick={run}
-            disabled={!canRun}
-            title={disabledReason || undefined}
-            whileTap={canRun ? { scale: 0.94 } : undefined}
-            transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+          <motion.div
+            ref={runBtnRef}
+            style={{ x: runMagnetic.x, y: runMagnetic.y }}
+            onMouseMove={runMagnetic.onMouseMove}
+            onMouseLeave={runMagnetic.onMouseLeave}
+            whileHover={{ scale: 1.025, y: -1 }}
+            whileTap={{ scale: 0.94, y: 1 }}
           >
-            {isRunning ? 'Running…' : 'Run'}
-          </motion.button>
+            <ShimmerButton
+              onClick={run}
+              disabled={!canRun || isRunning}
+              shimmerColor="#ffffff"
+              shimmerSize="0.06em"
+              shimmerDuration="2.5s"
+              background="linear-gradient(135deg, #C77DFF 0%, #F72585 100%)"
+              borderRadius="var(--radius-md)"
+              className="h-9 px-5 text-sm font-bold tracking-wider font-display"
+            >
+              {isRunning && <Loader2 size={13} className="animate-spin mr-1.5 inline-block" />}
+              {isRunning ? 'Running…' : 'Run'}
+            </ShimmerButton>
+          </motion.div>
         </div>
 
         {lastAudio && (
@@ -1009,7 +1067,18 @@ export default function PipelineView(): JSX.Element {
           <TypewriterCard text={lastText} mode={mode} />
         )}
 
-        <OutputFileList files={outputs} fromTool="pipeline" onClear={() => setOutputs([])} />
+        <motion.div
+          animate={{
+            scale: jobGlow ? [1, 1.008, 1] : 1,
+            boxShadow: jobGlow
+              ? ['0 0 0 0px rgba(199,125,255,0)', '0 0 0 1px rgba(199,125,255,0.45), 0 0 28px rgba(199,125,255,0.14)', '0 0 0 0px rgba(199,125,255,0)']
+              : '0 0 0 0px rgba(199,125,255,0)',
+          }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          style={{ borderRadius: 'var(--radius-xl)' }}
+        >
+          <OutputFileList files={outputs} fromTool="pipeline" onClear={() => setOutputs([])} />
+        </motion.div>
       </div>
 
       <ProfileCreationSheet
