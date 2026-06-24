@@ -154,7 +154,10 @@ export default function SplitterView(): JSX.Element {
             filename:  p.split(/[\\/]/).pop() ?? p,
             createdAt: ts,
           }))
-          setOutputs(prev => [...files, ...prev])
+          setOutputs(prev => {
+            const seen = new Set(prev.map(f => f.path))
+            return [...files.filter(f => !seen.has(f.path)), ...prev]
+          })
           toast.success(`${files.length} stem${files.length !== 1 ? 's' : ''} extracted`)
           const rect = runBtnRef.current?.getBoundingClientRect()
           if (rect) burst(rect.left + rect.width / 2, rect.top + rect.height / 2)
