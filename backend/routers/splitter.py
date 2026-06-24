@@ -58,7 +58,10 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
             import torch
             import torchaudio
 
-            wav, sr = torchaudio.load(payload.input_path)
+            try:
+                wav, sr = torchaudio.load(payload.input_path, backend='soundfile')
+            except TypeError:
+                wav, sr = torchaudio.load(payload.input_path)
 
             # Ensure stereo
             if wav.shape[0] == 1:
@@ -179,7 +182,10 @@ async def merge_stems(payload: MergePayload):
         target_sr: int | None = None
 
         for path in payload.input_paths:
-            wav, sr = torchaudio.load(path)
+            try:
+                wav, sr = torchaudio.load(path, backend='soundfile')
+            except TypeError:
+                wav, sr = torchaudio.load(path)
             if target_sr is None:
                 target_sr = sr
             elif sr != target_sr:
