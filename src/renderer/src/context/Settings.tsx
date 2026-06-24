@@ -12,20 +12,37 @@ export interface AppSettings {
   profilesPath: string
 }
 
-const DEFAULTS: AppSettings = {
-  outputPath:   'D:\\AlpHUB-Output',
-  modelsPath:   'D:\\Ses_Modelleri',
-  profilesPath: 'D:\\Ses_Modelleri\\rvc\\profiles',
+// Defaults intentionally empty — resolved async from OS home dir on first run.
+// Stored in localStorage after first resolution so subsequent loads are sync.
+const FALLBACK_DEFAULTS: AppSettings = {
+  outputPath:   'C:\\AlpHUB-Output',
+  modelsPath:   'C:\\AlpHUB-Models',
+  profilesPath: 'C:\\AlpHUB-Models\\rvc\\profiles',
 }
 
 function load(): AppSettings {
   try {
     const raw = localStorage.getItem(LS_KEY)
-    if (!raw) return { ...DEFAULTS }
-    return { ...DEFAULTS, ...JSON.parse(raw) }
+    if (!raw) return { ...FALLBACK_DEFAULTS }
+    return { ...FALLBACK_DEFAULTS, ...JSON.parse(raw) }
   } catch {
-    return { ...DEFAULTS }
+    return { ...FALLBACK_DEFAULTS }
   }
+}
+
+// On first run (no saved settings), resolve paths from OS home dir and persist.
+export async function initDefaultPaths(): Promise<void> {
+  if (localStorage.getItem(LS_KEY)) return
+  try {
+    const home = await window.api.getHomeDir()
+    const sep  = home.includes('/') ? '/' : '\\'
+    const defaults: AppSettings = {
+      outputPath:   home + sep + 'AlpHUB-Output',
+      modelsPath:   home + sep + 'AlpHUB-Models',
+      profilesPath: home + sep + 'AlpHUB-Models' + sep + 'rvc' + sep + 'profiles',
+    }
+    localStorage.setItem(LS_KEY, JSON.stringify(defaults))
+  } catch { /* api not available (e.g. web context) — use fallback */ }
 }
 
 function save(s: AppSettings): void {

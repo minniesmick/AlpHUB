@@ -98,6 +98,8 @@ function createWindow(): void {
 
 // ── Audio recording IPC ───────────────────────────────────────────────────
 
+ipcMain.handle('get-home-dir', () => app.getPath('home'))
+
 ipcMain.handle('save-temp-audio', async (_event, buffer: Uint8Array) => {
   const path = join(tmpdir(), `alphub-mic-${Date.now()}.webm`)
   await writeFile(path, Buffer.from(buffer))

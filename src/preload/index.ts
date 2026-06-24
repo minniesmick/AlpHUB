@@ -33,6 +33,10 @@ const api = {
   /** Read a text file from disk (for clipboard copy of STT/TTT outputs). */
   readTextFile: (filePath: string): Promise<string> =>
     ipcRenderer.invoke('read-text-file', filePath),
+
+  /** Returns the OS home directory (e.g. C:\Users\eersa). Used for default paths. */
+  getHomeDir: (): Promise<string> =>
+    ipcRenderer.invoke('get-home-dir'),
 }
 
 if (process.contextIsolated) {

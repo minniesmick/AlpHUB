@@ -7,7 +7,9 @@ import ReactDOM from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import { FileTransferProvider } from './context/FileTransfer'
 import { ToastProvider } from './context/Toast'
-import { SettingsProvider } from './context/Settings'
+import { SettingsProvider, initDefaultPaths } from './context/Settings'
+
+void initDefaultPaths()
 import App from './App'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
