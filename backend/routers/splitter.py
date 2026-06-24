@@ -56,12 +56,12 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
         # ── 2. Load + preprocess audio ────────────────────────────────────
         def load_audio():
             import torch
+            import soundfile as sf
             import torchaudio
 
-            try:
-                wav, sr = torchaudio.load(payload.input_path, backend='soundfile')
-            except TypeError:
-                wav, sr = torchaudio.load(payload.input_path)
+            # Use soundfile directly — torchaudio 2.6+ requires torchcodec by default
+            data, sr = sf.read(payload.input_path, dtype='float32', always_2d=True)
+            wav = torch.from_numpy(data.T).contiguous()  # [channels, samples]
 
             # Ensure stereo
             if wav.shape[0] == 1:
@@ -177,15 +177,14 @@ async def merge_stems(payload: MergePayload):
     def do_merge():
         import torch
         import torchaudio
+        import soundfile as sf
 
         waves: list = []
         target_sr: int | None = None
 
         for path in payload.input_paths:
-            try:
-                wav, sr = torchaudio.load(path, backend='soundfile')
-            except TypeError:
-                wav, sr = torchaudio.load(path)
+            data, sr = sf.read(path, dtype='float32', always_2d=True)
+            wav = torch.from_numpy(data.T).contiguous()
             if target_sr is None:
                 target_sr = sr
             elif sr != target_sr:
