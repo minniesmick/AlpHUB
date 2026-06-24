@@ -131,4 +131,8 @@ export const endpoints = {
   imagegenStatus:   ()                                    => api.get<{ apps: ImageGenApp[] }>('/api/imagegen/status'),
   imagegenOpen:     (port: number)                        => api.post<{ ok: boolean }>(`/api/imagegen/open?port=${port}`),
   imagegenLaunch:   (app_id: string)                      => api.post<{ ok: boolean }>(`/api/imagegen/launch/${app_id}`),
+  ideogramGenerate: (payload: { prompt: string; width?: number; height?: number; steps?: number; guidance?: number; seed?: number }) =>
+    api.post<{ job_id: string }>('/api/ideogram/generate', payload),
+  ideogramCancel:   (job_id: string)                      => api.delete<{ ok: boolean }>(`/api/ideogram/jobs/${job_id}`),
+  ideogramOutputs:  (limit?: number)                      => api.get<{ outputs: { path: string; filename: string; mtime: number }[] }>(`/api/ideogram/outputs${limit ? `?limit=${limit}` : ''}`),
 }

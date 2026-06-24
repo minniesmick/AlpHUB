@@ -2,12 +2,33 @@ import { app, BrowserWindow, shell, ipcMain, Notification } from 'electron'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { writeFile, readFile } from 'fs/promises'
+import { readFileSync } from 'fs'
 import { spawn, ChildProcess } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 
-const PYTHON_VENV    = 'D:\\AI_Ortak_Venv\\hub_venv\\Scripts\\python.exe'
+// ── User config (gitignored) ──────────────────────────────────────────────────
+// Copy user.config.example.json → user.config.json and fill in your paths.
+interface UserConfig {
+  pythonVenv?:   string
+  ollamaModels?: string
+}
+
+function loadUserConfig(): UserConfig {
+  // Search order: project root (dev), exe directory (prod)
+  const searchDirs = [process.cwd(), join(__dirname, '..', '..', '..'), __dirname]
+  for (const dir of searchDirs) {
+    try {
+      return JSON.parse(readFileSync(join(dir, 'user.config.json'), 'utf-8')) as UserConfig
+    } catch { /* try next */ }
+  }
+  return {}
+}
+
+const _cfg = loadUserConfig()
+
+const PYTHON_VENV    = _cfg.pythonVenv   ?? 'D:\\AI_Ortak_Venv\\hub_venv\\Scripts\\python.exe'
 const BACKEND_PORT   = 8765
-const OLLAMA_MODELS  = 'D:\\OllamaModels'
+const OLLAMA_MODELS  = _cfg.ollamaModels ?? 'D:\\OllamaModels'
 
 let backendProcess: ChildProcess | null = null
 let ollamaProcess:  ChildProcess | null = null

@@ -1,5 +1,6 @@
 """ImageGen router — check if local AI image generation apps are running."""
 import asyncio
+import os
 import socket
 import subprocess
 from fastapi import APIRouter, HTTPException
@@ -12,7 +13,7 @@ APPS = [
         "name":        "Fooocus",
         "port":        7865,
         "type":        "local",
-        "launch_path": r"D:\Fooocus\Fooocus_win64_2-5-0\Fooocus_win64_2-5-0\run.bat",
+        "launch_path": os.environ.get("FOOOCUS_PATH"),
         "url":         None,
     },
     {
@@ -20,7 +21,7 @@ APPS = [
         "name":        "ComfyUI",
         "port":        8188,
         "type":        "local",
-        "launch_path": r"C:\Users\alper\PROJELER\ComfyUI\baslat.bat",
+        "launch_path": os.environ.get("COMFYUI_PATH"),
         "url":         None,
     },
     {
@@ -28,7 +29,7 @@ APPS = [
         "name":        "Forge",
         "port":        7860,
         "type":        "local",
-        "launch_path": r"D:\Pinokio\api\Forge\app\webui.bat",
+        "launch_path": os.environ.get("FORGE_PATH"),
         "url":         None,
     },
     {

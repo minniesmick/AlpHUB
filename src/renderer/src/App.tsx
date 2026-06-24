@@ -8,6 +8,7 @@ import SettingsView from './views/Settings'
 import MonitorView from './views/Monitor'
 import ProjectsView from './views/Projects'
 import ImageGenView from './views/ImageGen'
+import IdeogramLocalView from './views/IdeogramLocal'
 
 export default function App(): JSX.Element {
   return (
@@ -20,6 +21,7 @@ export default function App(): JSX.Element {
         <Route path="/monitor" element={<MonitorView />} />
         <Route path="/projects" element={<ProjectsView />} />
         <Route path="/imagegen" element={<ImageGenView />} />
+        <Route path="/ideogram" element={<IdeogramLocalView />} />
         <Route path="/settings/*" element={<SettingsView />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

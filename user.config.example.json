@@ -1,0 +1,5 @@
+{
+  "_comment": "Copy this file to user.config.json and fill in your paths. user.config.json is gitignored.",
+  "pythonVenv": "C:\\path\\to\\your\\venv\\Scripts\\python.exe",
+  "ollamaModels": "C:\\path\\to\\your\\OllamaModels"
+}

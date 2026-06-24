@@ -32,6 +32,9 @@ backend/.env
 .env.*
 !.env.example
 
+# ── User-local config (machine-specific paths) ────────────────────────────────
+user.config.json
+
 # ── Design & AI workflow artifacts ────────────────────────────────────────────
 .design/
 .impeccable/

@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
-import { Workflow, ArrowRightLeft, Layers, Settings2, Activity, FolderGit2, ImagePlay } from 'lucide-react'
+import { Workflow, ArrowRightLeft, Layers, Settings2, Activity, FolderGit2, ImagePlay, Wand2 } from 'lucide-react'
 import { ws } from '@renderer/lib/ws'
 import { NAV_SPRING } from '@renderer/lib/motion'
 import { useTextScramble } from '@renderer/hooks/useTextScramble'
@@ -17,6 +17,7 @@ const tools = [
   { to: '/monitor',  icon: Activity,       label: 'Monitor',          shortcut: 'Ctrl+4' },
   { to: '/projects', icon: FolderGit2,     label: 'Projects',         shortcut: 'Ctrl+5' },
   { to: '/imagegen', icon: ImagePlay,      label: 'Image Gen',        shortcut: 'Ctrl+6' },
+  { to: '/ideogram', icon: Wand2,          label: 'Ideogram 4',       shortcut: 'Ctrl+7' },
 ]
 
 const EXPAND_SPRING = { type: 'spring' as const, stiffness: 240, damping: 28 }
