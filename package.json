@@ -7,7 +7,7 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
-    "backend": "D:\\AI_Ortak_Venv\\hub_venv\\Scripts\\python.exe -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8765 --reload",
+    "backend": "node scripts/start-backend.js",
     "start": "concurrently --kill-others-on-fail -n backend,electron -c magenta,cyan \"npm run backend\" \"npm run dev\"",
     "setup-venv": "cd backend && powershell -ExecutionPolicy Bypass -File setup_venv.ps1",
     "dist": "npm run build && electron-builder --win nsis",
