@@ -43,8 +43,9 @@ function startBackend(): void {
     PYTHON_VENV,
     ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', String(BACKEND_PORT)],
     {
-      cwd: backendCwd,
-      stdio: 'pipe'
+      cwd:         backendCwd,
+      stdio:       'pipe',
+      windowsHide: true,   // prevent black console window on Windows
     }
   )
 
@@ -148,9 +149,10 @@ ipcMain.handle('ollama-start', async () => {
   }
 
   ollamaProcess = spawn('ollama', ['serve'], {
-    env:   { ...process.env, OLLAMA_MODELS },
-    stdio: 'pipe',
-    shell: false,
+    env:         { ...process.env, OLLAMA_MODELS },
+    stdio:       'pipe',
+    shell:       false,
+    windowsHide: true,   // prevent black console window on Windows
   })
 
   ollamaProcess.stdout?.on('data', d => process.stdout.write(`[Ollama] ${d}`))
