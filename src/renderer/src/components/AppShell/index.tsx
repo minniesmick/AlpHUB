@@ -9,6 +9,7 @@ import { HelpModal } from '../HelpModal'
 import { CinematicOverlay } from '../CinematicOverlay'
 import { CursorGlow } from '../CursorGlow'
 import { CommandPalette, useCommandPalette } from '../CommandPalette'
+import { SetupOverlay } from '../SetupOverlay'
 import { Particles } from '@/components/ui/particles'
 import styles from './AppShell.module.css'
 import { ws } from '../../lib/ws'
@@ -41,7 +42,8 @@ function isTyping(e: KeyboardEvent): boolean {
 export default function AppShell(): JSX.Element {
   const contentRef = useRef<HTMLElement>(null)
   const [dims, setDims] = useState<ShellDims>({ contentWidth: 0, contentHeight: 0 })
-  const [helpOpen, setHelpOpen] = useState(false)
+  const [helpOpen,  setHelpOpen]  = useState(false)
+  const [setupDone, setSetupDone] = useState(false)
   const cmdPalette = useCommandPalette()
   const toast    = useToast()
   const navigate = useNavigate()
@@ -109,6 +111,7 @@ export default function AppShell(): JSX.Element {
         </div>
         <ToastStack />
         <HelpModal open={helpOpen} onClose={closeHelp} />
+        {!setupDone && <SetupOverlay onDone={() => setSetupDone(true)} />}
         <CursorGlow />
         <CommandPalette open={cmdPalette.open} onClose={cmdPalette.close} />
         <Toaster

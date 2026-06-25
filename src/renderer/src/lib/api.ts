@@ -135,4 +135,6 @@ export const endpoints = {
     api.post<{ job_id: string }>('/api/ideogram/generate', payload),
   ideogramCancel:   (job_id: string)                      => api.delete<{ ok: boolean }>(`/api/ideogram/jobs/${job_id}`),
   ideogramOutputs:  (limit?: number)                      => api.get<{ outputs: { path: string; filename: string; mtime: number }[] }>(`/api/ideogram/outputs${limit ? `?limit=${limit}` : ''}`),
+  setupStatus:      ()                                    => api.get<{ demucs: Record<string, boolean>; whisper: boolean; kokoro: boolean; all_ready: boolean }>('/api/setup/status'),
+  setupPrefetch:    ()                                    => api.post<{ ok: boolean }>('/api/setup/prefetch'),
 }

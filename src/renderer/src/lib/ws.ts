@@ -16,6 +16,9 @@ export interface StreamStatusEvent  { active: boolean }
 export interface SpectrumDataEvent  { node_id: string; fft: number[] }
 
 export interface WsStatusEvent       { connected: boolean }
+export interface SetupProgressEvent { stage: string; pct: number; msg: string }
+export interface SetupCompleteEvent { [k: string]: never }
+export interface SetupErrorEvent    { error: string }
 
 export type WsEventMap = {
   scan_progress:  ScanProgressEvent
@@ -28,6 +31,9 @@ export type WsEventMap = {
   stream_status:  StreamStatusEvent
   spectrum_data:  SpectrumDataEvent
   ws_status:      WsStatusEvent
+  setup_progress: SetupProgressEvent
+  setup_complete: SetupCompleteEvent
+  setup_error:    SetupErrorEvent
 }
 
 // ── Manager ────────────────────────────────────────────────────────────────

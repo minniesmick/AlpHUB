@@ -130,7 +130,7 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
 
         # ── 4. Export stems ───────────────────────────────────────────────
         def export_stems(sources_cpu):
-            import torchaudio
+            from pedalboard.io import AudioFile
 
             out_dir   = Path(payload.output_folder)
             in_stem   = Path(payload.input_path).stem
@@ -142,19 +142,14 @@ async def run_splitter(payload: SplitterRunPayload, request: Request):
                 fname = f"{in_stem}_{stem_name}.{payload.format}"
                 out_path = out_dir / fname
 
-                audio = sources_cpu[i]   # [channels, samples]
+                audio_np = sources_cpu[i].numpy()  # [channels, samples] float32
 
-                if payload.format == "wav":
-                    torchaudio.save(str(out_path), audio, model.samplerate,
-                                    encoding="PCM_S", bits_per_sample=16)
-                elif payload.format == "flac":
-                    torchaudio.save(str(out_path), audio, model.samplerate,
-                                    format="flac")
-                elif payload.format == "mp3":
-                    torchaudio.save(str(out_path), audio, model.samplerate,
-                                    format="mp3")
-                else:
-                    torchaudio.save(str(out_path), audio, model.samplerate)
+                with AudioFile(
+                    str(out_path), "w",
+                    samplerate=model.samplerate,
+                    num_channels=audio_np.shape[0],
+                ) as f:
+                    f.write(audio_np)
 
                 out_paths.append(str(out_path))
 

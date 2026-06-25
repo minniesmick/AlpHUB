@@ -17,7 +17,7 @@ import json
 import logging
 
 from services.job_queue import gpu_queue
-from routers import models, daw, pipeline, splitter, ollama, utils, system, projects, imagegen, ideogram_local
+from routers import models, daw, pipeline, splitter, ollama, utils, system, projects, imagegen, ideogram_local, setup
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("alphub")
@@ -42,6 +42,7 @@ app.include_router(system.router,   prefix="/api/system",   tags=["system"])
 app.include_router(projects.router, prefix="/api/projects", tags=["projects"])
 app.include_router(imagegen.router,       prefix="/api/imagegen",  tags=["imagegen"])
 app.include_router(ideogram_local.router, prefix="/api/ideogram",  tags=["ideogram"])
+app.include_router(setup.router,         prefix="/api/setup",     tags=["setup"])
 
 
 # ── WebSocket connection manager ───────────────────────────────────────────
