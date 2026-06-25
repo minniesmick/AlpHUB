@@ -467,7 +467,7 @@ export default function PipelineView(): JSX.Element {
           const filename = d.result_path.split(/[\\/]/).pop() ?? d.result_path
           setOutputs(prev => [{ path: d.result_path, filename, createdAt: Date.now() }, ...prev])
           if (mode === 'tts' || mode === 'sts') {
-            setLastAudio(`file:///${d.result_path}`)
+            setLastAudio(`file:///${d.result_path.replace(/\\/g, '/')}`)
           } else if (mode === 'stt' || mode === 'ttt') {
             window.api.readTextFile(d.result_path)
               .then(text => setLastText(text))
@@ -713,6 +713,7 @@ export default function PipelineView(): JSX.Element {
   const disabledReason: string = canRun ? '' :
     isRunning                          ? 'Job running — cancel first'     :
     mode === 'ttt' && !ollamaRunning   ? 'Start Ollama first'             :
+    mode === 'ttt' && !ollamaModelId && ollamaModels.length === 0 ? 'No models — run: ollama pull llama3.2:3b' :
     mode === 'ttt' && !ollamaModelId   ? 'Select an Ollama model'         :
     (mode === 'stt' || mode === 'sts') ? 'Drop or record an audio file'   :
     mode === 'tts'                     ? 'Enter text to synthesize'       :

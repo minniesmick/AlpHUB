@@ -281,7 +281,7 @@ export default function MonitorView(): JSX.Element {
                 <div className={styles.sparkCard}>
                   <div className={styles.sparkHeader}>
                     <span className={styles.sparkLabel}>Network</span>
-                    <span className={styles.sparkValue}>{netRecvHist.at(-1)?.toFixed(2) ?? '0'} MB</span>
+                    <span className={styles.sparkValue}>{((netRecvHist.at(-1) ?? 0) / (POLL_MS / 1000)).toFixed(2)} MB/s</span>
                   </div>
                   <Sparkline history={netRecvHist} color="var(--primary)" label="Network recv" />
                   <Sparkline history={netSentHist} color="var(--secondary)" label="Network sent" />
