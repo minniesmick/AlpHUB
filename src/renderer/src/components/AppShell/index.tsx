@@ -29,6 +29,7 @@ const ROUTE_SHORTCUTS: Record<string, string> = {
   '4': '/monitor',
   '5': '/projects',
   '6': '/imagegen',
+  '7': '/ideogram',
   ',': '/settings',
 }
 

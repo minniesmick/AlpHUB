@@ -1,5 +1,15 @@
 /* Monitor view */
 
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-rotate {
+  to { --border-angle: 360deg; }
+}
+
 .view {
   display: flex;
   flex-direction: column;
@@ -12,16 +22,17 @@
 
 .ambientOrb {
   position: absolute;
-  width: 70%;
-  height: 55%;
+  width: 40%;
+  height: 30%;
   bottom: 0;
-  left: -10%;
+  left: -5%;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.06;
+  filter: blur(48px);
+  opacity: 0.07;
   transition: background-color 2.5s var(--ease-smooth);
   pointer-events: none;
   z-index: -1;
+  will-change: background-color;
 }
 
 .toolbar {

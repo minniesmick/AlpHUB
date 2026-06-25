@@ -128,13 +128,10 @@ function SpringBar({ pct, className }: { pct: number; className: string }) {
 // ── Spring number ───────────────────────────────────────────────────────────────
 
 function SpringNum({ value, decimals = 0, unit = '' }: { value: number; decimals?: number; unit?: string }) {
-  const spring = useSpring(value, BAR_SPRING)
+  const spring  = useSpring(value, BAR_SPRING)
+  const display = useTransform(spring, v => `${v.toFixed(decimals)}${unit}`)
   useEffect(() => { spring.set(value) }, [value, spring])
-  return (
-    <motion.span>
-      {useTransform(spring, v => `${v.toFixed(decimals)}${unit}`)}
-    </motion.span>
-  )
+  return <motion.span>{display}</motion.span>
 }
 
 // ── Main view ───────────────────────────────────────────────────────────────────
