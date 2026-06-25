@@ -14,14 +14,14 @@
 
 .ambientOrb {
   position: absolute;
-  width: 55%;
-  height: 45%;
+  width: 38%;
+  height: 28%;
   bottom: 5%;
   right: -5%;
   border-radius: 50%;
   background-color: var(--success);
-  filter: blur(100px);
-  opacity: 0.05;
+  filter: blur(48px);
+  opacity: 0.07;
   pointer-events: none;
   z-index: 0;
 }
